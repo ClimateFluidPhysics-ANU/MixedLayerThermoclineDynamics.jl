@@ -1,0 +1,15 @@
+name = "MixedLayerThermoclineDynamics"
+uuid = "1d4a6882-6b5f-4564-9c28-3a65b9d963cb"
+license = "MIT"
+authors = ["Dhruv Bhagtani <Dhruv.Bhagtani@anu.edu.au>", "Navid Constantinou <navidcy@gmail.com>"]
+version = "0.1.0"
+
+[compat]
+julia = "^1.6"
+
+[extras]
+Coverage = "a2441757-f6aa-5fb2-8edb-039e3f45d037"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test", "Coverage"]
