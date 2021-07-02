@@ -1,5 +1,5 @@
-using Documenter, Example
+using Documenter, MixedLayerThermoclineDynamics
 
-makedocs(modules = [Example], sitename = "Example.jl")
+makedocs(modules = [MixedLayerThermoclineDynamics], sitename = "MixedLayerThermoclineDynamics.jl")
 
-deploydocs(repo = "github.com/JuliaLang/Example.jl.git")
+deploydocs(repo = "github.com/ClimateFluidPhysics-ANU/MixedLayerThermoclineDynamics.jl.git")
