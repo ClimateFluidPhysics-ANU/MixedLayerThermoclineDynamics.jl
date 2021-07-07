@@ -1,8 +1,20 @@
+"""
+    struct Grid1D
+
+A one-dimensional `grid`.
+
+$(TYPEDFIELDS)
+"""
 struct Grid1D
+    "number of points in x"
     nx::Int
+    "grid spacing in x"
     dx::Float64
+    "domain extent in x"
     Lx::Float64
+    "to be filled..."
     xu::Vector
+    "blah blah..."
     xt::Vector
 end
 
