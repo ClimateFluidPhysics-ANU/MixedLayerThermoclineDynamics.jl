@@ -1,0 +1,3 @@
+var documenterSearchIndex = {"docs":
+[{"location":"#MixedLayerThermoclineDynamics","page":"MixedLayerThermoclineDynamics","title":"MixedLayerThermoclineDynamics","text":"","category":"section"},{"location":"","page":"MixedLayerThermoclineDynamics","title":"MixedLayerThermoclineDynamics","text":"Modules = [MixedLayerThermoclineDynamics]","category":"page"},{"location":"#MixedLayerThermoclineDynamics.Grid1D","page":"MixedLayerThermoclineDynamics","title":"MixedLayerThermoclineDynamics.Grid1D","text":"struct Grid1D\n\nA one-dimensional grid.\n\nnx::Int64\nnumber of points in x\ndx::Float64\ngrid spacing in x\nLx::Float64\ndomain extent in x\nxu::Vector{T} where T\nto be filled...\nxt::Vector{T} where T\nblah blah...\n\n\n\n\n\n","category":"type"}]
+}
