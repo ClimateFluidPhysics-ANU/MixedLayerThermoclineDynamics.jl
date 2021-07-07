@@ -1,3 +1,2 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-MixedLayerThermoclineDynamics = "1d4a6882-6b5f-4564-9c28-3a65b9d963cb"
