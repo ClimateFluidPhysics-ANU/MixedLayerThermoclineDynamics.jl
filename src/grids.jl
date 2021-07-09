@@ -21,7 +21,7 @@ end
 function Grid1D(nx, x_start, x_end)
     Lx = x_end - x_start
     dx = Lx/nx
-    xu = range(x_start, stop=x_end-dx, length=nx)
+    xu = range(x_start, stop = x_end-dx, length = nx)
     xt = xu .+ dx/2
 
     return Grid1D(nx, dx, Lx, xu, xt)
@@ -62,9 +62,9 @@ function Grid2D(nx, ny, x_start, x_end, y_start, y_end)
     Ly = y_end - y_start
     dx = Lx/nx
     dy = Ly/ny
-    xu = range(x_start, x_end - dx, nx)
+    xu = range(x_start, stop = x_end - dx, length = nx)
     xt = xu .+ dx/2
-    yu = range(y_start, y_end - dy, ny)
+    yu = range(y_start, stop = y_end - dy, length = ny)
     yt = yu .+ dy/2
     
     return Grid2D(nx, ny, dx, dy, Lx, Ly, xu, xt, yu, yt)
