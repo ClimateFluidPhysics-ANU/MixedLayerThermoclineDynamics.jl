@@ -6,7 +6,7 @@ using Test, MixedLayerThermoclineDynamics
     nx, ny = 10, 12
     Lx, Ly = 2.0, 2.4
     
-    grid1D = MixedLayerThermoclineDynamics.Grid1D(nx, 0, Lx)
+    grid1D = Grid1D(nx, 0, Lx)
     
     @test test_dx(grid1D, Lx/nx)
 end

@@ -18,10 +18,11 @@ struct Grid1D
     xt::Vector
 end
 
-function Grid1D(nx, x_beg, x_end)
-    dx = (x_end - x_beg)/(nx + 0.5)
-    xu = LinRange(x_beg, x_end - dx/2, nx)
-    xt = LinRange(x_beg + dx/2, x_end, nx)
+function Grid1D(nx, x_start, x_end)
+    Lx = x_end - x_start
+    dx = Lx / nx
+    xu = range(x_start, stop=x_end-dx, length=nx)
+    xt = xu .+ dx/2
 
     return Grid1D(nx, dx, Lx, xu, xt)
 end
