@@ -1,52 +1,71 @@
 """
     struct Grid1D
 
-A one-dimensional `grid`.
+Returns a one-dimensional `grid`.
 
 $(TYPEDFIELDS)
 """
 struct Grid1D
-    "number of points in x"
+    "Number of points in x-direction"
     nx::Int
-    "grid spacing in x"
+    "Grid spacing in x-direction"
     dx::Float64
-    "domain extent in x"
+    "Domain extent in x-direction"
     Lx::Float64
-    "to be filled..."
+    "U-grid in x-direction"
     xu::Vector
-    "blah blah..."
+    "T-grid in x-direction"
     xt::Vector
 end
 
 function Grid1D(nx, x_start, x_end)
     Lx = x_end - x_start
-    dx = Lx / nx
+    dx = Lx/nx
     xu = range(x_start, stop=x_end-dx, length=nx)
     xt = xu .+ dx/2
 
     return Grid1D(nx, dx, Lx, xu, xt)
 end
 
+"""
+    struct Grid2D
+
+Returns a two-dimensional `grid`.
+
+$(TYPEDFIELDS)
+"""
 struct Grid2D
+    "Number of points in x-direction"
     nx::Int
+    "Number of points in y-direction"
     ny::Int
+    "Grid spacing in x-direction"
     dx::Float64
+    "Grid spacing in y-direction"
     dy::Float64
+    "Domain extent in x-direction"
     Lx::Float64
+    "Domain extent in y-direction"
     Ly::Float64
+    "U-grid in x-direction"
     xu::Vector
+    "T-grid in x-direction"
     xt::Vector
+    "U-grid in y-direction"
     yu::Vector
+    "T-grid in y-direction"
     yt::Vector
 end
 
-function Grid2D(nx, ny, x_beg, x_end, y_beg, y_end)
-    dx = (x_end - x_beg)/(nx + 0.5)
-    dy = (y_end - y_beg)/(ny + 0.5)
-    xu = LinRange(x_beg, x_end - dx/2, nx)
-    xt = LinRange(x_beg + dx/2, x_end, nx)
-    yu = LinRange(y_beg, y_end - dy/2, ny)
-    yt = LinRange(y_beg + dy/2, y_end, ny)
+function Grid2D(nx, ny, x_start, x_end, y_start, y_end)
+    Lx = x_end - x_start
+    Ly = y_end - y_start
+    dx = Lx/nx
+    dy = Ly/ny
+    xu = range(x_start, x_end - dx, nx)
+    xt = xu .+ dx/2
+    yu = range(y_start, y_end - dy, ny)
+    yt = yu .+ dy/2
     
     return Grid2D(nx, ny, dx, dy, Lx, Ly, xu, xt, yu, yt)
 end
