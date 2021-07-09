@@ -2,7 +2,7 @@ module MixedLayerThermoclineDynamics
 
 using DocStringExtensions
 
-export hello, domath
+export Grid1D, Grid2D
 
 include("grids.jl")
 
