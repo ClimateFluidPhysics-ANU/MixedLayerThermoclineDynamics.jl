@@ -13,24 +13,24 @@ struct Grid1D
     "Domain extent in x-direction"
     Lx::Float64
     "U-grid in x-direction"
-    xu::Vector
+    xF::Vector
     "T-grid in x-direction"
-    xt::Vector
+    xC::Vector
 end
 
 function Grid1D(nx, x_start, x_end)
     Lx = x_end - x_start
     dx = Lx/nx
-    xu = range(x_start, stop = x_end-dx, length = nx)
-    xt = xu .+ dx/2
+    xF = range(x_start, stop = x_end-dx, length = nx)
+    xC = xF .+ dx/2
 
-    return Grid1D(nx, dx, Lx, xu, xt)
+    return Grid1D(nx, dx, Lx, xF, xC)
 end
 
 """
     struct Grid2D
 
-Returns a two-dimensional `grid`.
+Returns a two-dimensional staggered `grid`.
 
 $(TYPEDFIELDS)
 """
@@ -48,13 +48,13 @@ struct Grid2D
     "Domain extent in y-direction"
     Ly::Float64
     "U-grid in x-direction"
-    xu::Vector
+    xF::Vector
     "T-grid in x-direction"
-    xt::Vector
+    xC::Vector
     "U-grid in y-direction"
-    yu::Vector
+    yF::Vector
     "T-grid in y-direction"
-    yt::Vector
+    yC::Vector
 end
 
 function Grid2D(nx, ny, x_start, x_end, y_start, y_end)
@@ -62,10 +62,10 @@ function Grid2D(nx, ny, x_start, x_end, y_start, y_end)
     Ly = y_end - y_start
     dx = Lx/nx
     dy = Ly/ny
-    xu = range(x_start, stop = x_end - dx, length = nx)
-    xt = xu .+ dx/2
-    yu = range(y_start, stop = y_end - dy, length = ny)
-    yt = yu .+ dy/2
+    xF = range(x_start, stop = x_end - dx, length = nx)
+    xC = xF .+ dx/2
+    yF = range(y_start, stop = y_end - dy, length = ny)
+    yC = yF .+ dy/2
     
-    return Grid2D(nx, ny, dx, dy, Lx, Ly, xu, xt, yu, yt)
+    return Grid2D(nx, ny, dx, dy, Lx, Ly, xF, xC, yF, yC)
 end
