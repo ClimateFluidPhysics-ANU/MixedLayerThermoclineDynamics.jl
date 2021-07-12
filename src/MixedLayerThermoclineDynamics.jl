@@ -1,26 +1,10 @@
 module MixedLayerThermoclineDynamics
 
-export hello, domath
+using DocStringExtensions
 
-"""
-    hello(who::String)
+export Grid1D, Grid2D
 
-Return "Hello, `who`".
-"""
-hello(who::String) = "Hello, $who"
+include("grids.jl")
 
-"""
-    domath(x::Number)
-
-Return `x + 5`.
-"""
-domath(x::Number) = x + 5
-
-"""
-    compute_square(x)
-
-Compute the square of something.
-"""
-compute_square(x) = x^2
 
 end # module
