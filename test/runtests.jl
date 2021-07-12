@@ -12,7 +12,7 @@ using Test, MixedLayerThermoclineDynamics
 
     @test test_dx(grid1D, dx)
     @test test_xF(grid1D, range(0, stop = Lx - dx, length = nx))
-    @test xdomain_length(grid1D, Lx - 0)
+    @test xdomain_length(grid1D, Lx)
 
     grid2D = Grid2D(nx, ny, 0, Lx, 0, Ly)
 
