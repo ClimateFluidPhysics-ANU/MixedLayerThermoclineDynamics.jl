@@ -2,7 +2,7 @@ function test_dx(grid, dx)
     return grid.dx ≈ dx
 end
 
-function test_dy(grid, dx, dy)
+function test_dy(grid, dy)
     return grid.dy ≈ dy
 end
 
