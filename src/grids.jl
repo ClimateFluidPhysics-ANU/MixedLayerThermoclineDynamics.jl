@@ -1,11 +1,11 @@
 """
-    struct Grid1D
+    struct Grid1D <: AbstractGrid
 
 Returns a one-dimensional staggered `grid`.
 
 $(TYPEDFIELDS)
 """
-struct Grid1D
+struct Grid1D <: AbstractGrid
     "Number of points in x-direction"
     nx::Int
     "Grid spacing in x-direction"
@@ -28,13 +28,13 @@ function Grid1D(nx, x_start, x_end)
 end
 
 """
-    struct Grid2D
+    struct Grid2D <: AbstractGrid
 
 Returns a two-dimensional staggered `grid`.
 
 $(TYPEDFIELDS)
 """
-struct Grid2D
+struct Grid2D <: AbstractGrid
     "Number of points in x-direction"
     nx::Int
     "Number of points in y-direction"
