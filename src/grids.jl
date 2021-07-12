@@ -1,7 +1,7 @@
 """
     struct Grid1D
 
-Returns a one-dimensional `grid`.
+Returns a one-dimensional staggered `grid`.
 
 $(TYPEDFIELDS)
 """
