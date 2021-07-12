@@ -21,5 +21,5 @@ using Test, MixedLayerThermoclineDynamics
     @test test_yF(grid2D, range(0, stop = Ly - grid2D.dy, length = ny))
     @test test_yC(grid2D, range(grid2D.dy/2, stop = Ly - grid2D.dy/2, length = ny))
     @test xdomain_length(grid2D, Lx)
-    @test ydomain_length(grid2D, Ly - 0)
+    @test ydomain_length(grid2D, Ly)
 end
