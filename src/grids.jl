@@ -12,9 +12,9 @@ struct Grid1D
     dx::Float64
     "Domain extent in x-direction"
     Lx::Float64
-    "U-grid in x-direction"
+    "Cell faces in x-direction"
     xF::Vector
-    "T-grid in x-direction"
+    "Cell centres in x-direction"
     xC::Vector
 end
 
@@ -47,13 +47,13 @@ struct Grid2D
     Lx::Float64
     "Domain extent in y-direction"
     Ly::Float64
-    "U-grid in x-direction"
+    "Cell faces in x-direction"
     xF::Vector
-    "T-grid in x-direction"
+    "Cell centres in x-direction"
     xC::Vector
-    "U-grid in y-direction"
+    "Cell faces in y-direction"
     yF::Vector
-    "T-grid in y-direction"
+    "Cell centres in y-direction"
     yC::Vector
 end
 
