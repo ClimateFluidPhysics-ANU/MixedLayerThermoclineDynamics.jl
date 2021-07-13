@@ -4,7 +4,9 @@ using DocStringExtensions
 
 export Grid1D, Grid2D
 
-include("grids.jl")
+"Abstract supertype for grids."
+abstract type AbstractGrid end
 
+include("grids.jl")
 
 end # module
