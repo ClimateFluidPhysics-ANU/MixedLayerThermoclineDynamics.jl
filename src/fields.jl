@@ -15,10 +15,10 @@ A field datatype.
 $(TYPEDFIELDS)
 """
 struct Field{LX<:AbstractLocation, LY<:Union{AbstractLocation, Nothing}, G}
-    "Array storing the values of the field."
-    data::Array
-    "The grid that the field lives on."
-    grid::G
+    "Array with the values of the field."
+    data :: Array
+    "The grid on which the field lives."
+    grid :: G
     
     Field(LX, LY, data, grid::G) where G = new{LX, LY, G}(data, grid)    
 end
@@ -31,7 +31,7 @@ Constructs a 1D field of `data` at location `LX` on `grid`.
 Field1D(LX, data, grid::Grid1D) = Field(LX, Nothing, data, grid)
 
 """
-    Field2D(LX, data, grid::Grid1D)
+    Field2D(LX, LY, data, grid::Grid2D)
 
 Constructs a 2D field of `data` at location `(LX, LY)` on `grid`.
 """
