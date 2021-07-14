@@ -5,16 +5,16 @@ struct Centre <: AbstractLocation end
 struct Face <: AbstractLocation end 
 
 """
-    struct Field{LX<:AbstractLocation, LY<:AbstractLocation, LY<:}
+    struct Field{LX<:AbstractLocation, LY<:AbstractLocation}
 
 A field datatype.
 
 $(TYPEDFIELDS)
 """
-struct Field{LX<:AbstractLocation, LY<:AbstractLocation, LY<:}
-	  "Array storing the values of a 1D variable"
+struct Field{LX<:AbstractLocation, LY<:AbstractLocation}
+	  "Array storing the values of the field."
     data::Array
-    "Grid properties for 1D variable"
+    "The grid that the field lives on."
     grid::AbstractGrid
 end
 
