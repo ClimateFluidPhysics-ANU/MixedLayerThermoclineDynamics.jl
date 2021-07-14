@@ -1,6 +1,9 @@
 """ Type for location at the cell centres. """
 struct Centre <: AbstractLocation end 
 
+# US spelling alias
+Center = Centre
+
 """ Type for location at the cell faces. """
 struct Face <: AbstractLocation end 
 

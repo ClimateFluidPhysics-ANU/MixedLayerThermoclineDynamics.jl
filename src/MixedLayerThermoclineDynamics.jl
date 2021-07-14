@@ -9,7 +9,8 @@ export
   
   AbstractLocation,
   Face,
-  Cell,
+  Center,
+  Centre,
   
   Field,
   Field1D,
