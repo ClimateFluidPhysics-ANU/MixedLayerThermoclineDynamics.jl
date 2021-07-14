@@ -1,7 +1,7 @@
-""" Abstruct type for location at the cell centres. """
+""" Type for location at the cell centres. """
 struct Centre <: AbstractLocation end 
 
-""" Abstruct type for location at the cell faces. """
+""" Type for location at the cell faces. """
 struct Face <: AbstractLocation end 
 
 """
@@ -11,23 +11,25 @@ A field datatype.
 
 $(TYPEDFIELDS)
 """
-struct Field{LX<:AbstractLocation, LY<:AbstractLocation}
-	  "Array storing the values of the field."
+struct Field{LX<:AbstractLocation, LY<:Union{AbstractLocation, Nothing}, G}
+    "Array storing the values of the field."
     data::Array
     "The grid that the field lives on."
-    grid::AbstractGrid
+    grid::G
+    
+    Field(LX, LY, data, grid::G) where G = new{LX, LY, G}(data, grid)    
 end
 
 """
     Field1D(LX, data, grid::Grid1D)
-		
-		Constructs a 1D field of `data` at location `LX` on `grid`.
+
+Constructs a 1D field of `data` at location `LX` on `grid`.
 """
-Field1D(LX, data, grid::Grid1D) = Field{LX, Nothing}(data, grid)
+Field1D(LX, data, grid::Grid1D) = Field(LX, Nothing, data, grid)
 
 """
     Field2D(LX, data, grid::Grid1D)
-		
-		Constructs a 2D field of `data` at location `(LX, LY)` on `grid`.
+
+Constructs a 2D field of `data` at location `(LX, LY)` on `grid`.
 """
-Field2D((LX, LY), data, grid::Grid2D) = Field{LX, LY}(data, grid)
+Field2D(LX, LY, data, grid::Grid2D) = Field(LX, LY, data, grid)
