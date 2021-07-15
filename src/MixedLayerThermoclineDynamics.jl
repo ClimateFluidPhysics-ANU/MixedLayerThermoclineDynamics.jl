@@ -4,6 +4,9 @@ using DocStringExtensions
 
 export
   AbstractGrid,
+  AbstractTopology,
+  Periodic,
+  Bounded,
   Grid1D,
   Grid2D,
   
@@ -16,6 +19,15 @@ export
   Field1D,
   Field2D,
   Field
+
+""" Abstract supertype for topology of grids. """
+abstract type AbstractTopology end
+
+""" Type for location at the cell centres. """
+struct Periodic <: AbstractTopology end 
+
+""" Type for location at the cell centres. """
+struct Bounded <: AbstractTopology end 
 
 """ Abstract supertype for grids. """
 abstract type AbstractGrid end

@@ -8,13 +8,13 @@ using Test, MixedLayerThermoclineDynamics
     
     dx, dy = Lx/nx, Ly/ny
     
-    grid1D = Grid1D(nx, 0, Lx)
+    grid1D = Grid1D(Periodic(), nx, 0, Lx)
 
     @test test_dx(grid1D, dx)
     @test test_xF(grid1D, range(0, stop = Lx - dx, length = nx))
     @test xdomain_length(grid1D, Lx)
 
-    grid2D = Grid2D(nx, ny, 0, Lx, 0, Ly)
+    grid2D = Grid2D(Periodic(), Periodic(), nx, ny, 0, Lx, 0, Ly)
 
     @test test_dx(grid2D, dx)
     @test test_dy(grid2D, dy)
@@ -32,8 +32,8 @@ end
     
     dx, dy = Lx/nx, Ly/ny
     
-    grid1D = Grid1D(nx, 0, Lx)
-    grid2D = Grid2D(nx, ny, 0, Lx, 0, Ly)
+    grid1D = Grid1D(Periodic(), nx, 0, Lx)
+    grid2D = Grid2D(Periodic(), Periodic(), nx, ny, 0, Lx, 0, Ly)
     
     # 1D Fields
     hdata = @. sin(2π * grid1D.xC / Lx)
