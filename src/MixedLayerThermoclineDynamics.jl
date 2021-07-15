@@ -12,15 +12,19 @@ export
   Center,
   Centre,
   
-  Field,
+  AbstractField,
   Field1D,
-  Field2D
+  Field2D,
+  Field
 
 """ Abstract supertype for grids. """
 abstract type AbstractGrid end
 
 """ Abstract supertype for location of variables. """
 abstract type AbstractLocation end
+
+""" Abstract supertype for fields. """
+abstract type AbstractField end
 
 include("grids.jl")
 include("fields.jl")

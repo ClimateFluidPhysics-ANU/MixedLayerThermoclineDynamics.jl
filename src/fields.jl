@@ -14,7 +14,7 @@ A field datatype for 1D objects.
 
 $(TYPEDFIELDS)
 """
-struct Field1D{LX<:AbstractLocation}
+struct Field1D{LX<:AbstractLocation} <: AbstractField
     "Array with the values of the field."
     data :: Array
     "The grid on which the field lives."
@@ -30,7 +30,7 @@ A field datatype for 2D objects.
 
 $(TYPEDFIELDS)
 """
-struct Field2D{LX<:AbstractLocation, LY<:AbstractLocation}
+struct Field2D{LX<:AbstractLocation, LY<:AbstractLocation} <: AbstractField
     "Array with the values of the field."
     data :: Array
     "The grid on which the field lives."
