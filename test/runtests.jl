@@ -25,3 +25,31 @@ using Test, MixedLayerThermoclineDynamics
     @test xdomain_length(grid2D, Lx)
     @test ydomain_length(grid2D, Ly)
 end
+
+@time @testset "Field tests" begin
+    include("test_fields.jl")
+
+    nx, ny = 10, 12
+    Lx, Ly = 2.0, 2.4
+    
+    dx, dy = Lx/nx, Ly/ny
+    
+    grid1D = Grid1D(nx, 0, Lx)
+    hdata = zeros(nx)
+    udata = zeros(nx)
+    hdata = sin.(2*π*grid1D.xC/Lx)
+    udata = sin.(2*π*grid1D.xF/Lx)
+
+    h1D = Field(Centre, hdata, grid1D)
+    u1D = Field(Face, udata, grid1D)
+    @test location_centre(h1D)
+    @test location_face(u1D)
+
+    @test test_grid(h1D, grid1D)
+    @test test_grid(u1D, grid1D)
+
+    @test test_data(h1D, hdata)
+    @test test_data(u1D, udata)
+end
+
+
