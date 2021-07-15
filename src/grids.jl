@@ -84,16 +84,11 @@ end
 
 Returns the face locations for a dimension with topology `T`, number of grid points `n` and `h`
 halo points, grid spacing `d`, and extent `L`.
-
-$(TYPEDFIELDS)
 """
 function construct_faces(T::AbstractTopology, n, h, d, L, startface)
     
-    if isa(T, Periodic)
-        F = range(startface - h*d, stop = L - d + h*d, length = n + 2h)
-    elseif isa(T, Bounded)
-        F = range(startface - h*d, stop = L + h*d, length = n + 1 + 2h)
-    end
+    end_face = isa(T, Periodic) ? L - d : L
+    total_faces = isa(T, Periodic) ? n : n + 1
     
-    return F
+    return range(startface - h*d, stop = end_face + h*d, length = total_faces)
 end
