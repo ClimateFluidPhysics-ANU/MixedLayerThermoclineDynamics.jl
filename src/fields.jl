@@ -10,7 +10,7 @@ struct Face <: AbstractLocation end
 """
     struct Field1D{LX<:AbstractLocation}
 
-A field datatype for 2D objects.
+A field datatype for 1D objects.
 
 $(TYPEDFIELDS)
 """
@@ -40,14 +40,14 @@ struct Field2D{LX<:AbstractLocation, LY<:AbstractLocation}
 end
 
 """
-    Field1D(LX, data, grid::Grid1D)
+    Field(LX, data, grid::Grid1D)
 
 Constructs a 1D field of `data` at location `LX` on `grid`.
 """
 Field(LX, data, grid::Grid1D) = Field1D(LX, data, grid)
 
 """
-    Field2D(LX, LY, data, grid::Grid2D)
+    Field(LX, LY, data, grid::Grid2D)
 
 Constructs a 2D field of `data` at location `(LX, LY)` on `grid`.
 """
