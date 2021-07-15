@@ -8,19 +8,35 @@ Center = Centre
 struct Face <: AbstractLocation end 
 
 """
-    struct Field{LX<:AbstractLocation, LY<:AbstractLocation}
+    struct Field1D{LX<:AbstractLocation}
 
-A field datatype.
+A field datatype for 2D objects.
 
 $(TYPEDFIELDS)
 """
-struct Field{LX<:AbstractLocation, LY<:Union{AbstractLocation, Nothing}, G}
+struct Field1D{LX<:AbstractLocation}
     "Array with the values of the field."
     data :: Array
     "The grid on which the field lives."
-    grid :: G
+    grid :: Grid1D
     
-    Field(LX, LY, data, grid::G) where G = new{LX, LY, G}(data, grid)    
+    Field1D(LX, data, grid) = new{LX}(data, grid)    
+end
+
+"""
+    struct Field2D{LX<:AbstractLocation, LY<:AbstractLocation}
+
+A field datatype for 2D objects.
+
+$(TYPEDFIELDS)
+"""
+struct Field2D{LX<:AbstractLocation, LY<:AbstractLocation}
+    "Array with the values of the field."
+    data :: Array
+    "The grid on which the field lives."
+    grid :: Grid2D
+    
+    Field2D(LX, LY, data, grid) = new{LX, LY}(data, grid)    
 end
 
 """
@@ -28,11 +44,11 @@ end
 
 Constructs a 1D field of `data` at location `LX` on `grid`.
 """
-Field1D(LX, data, grid::Grid1D) = Field(LX, Nothing, data, grid)
+Field(LX, data, grid::Grid1D) = Field1D(LX, data, grid)
 
 """
     Field2D(LX, LY, data, grid::Grid2D)
 
 Constructs a 2D field of `data` at location `(LX, LY)` on `grid`.
 """
-Field2D(LX, LY, data, grid::Grid2D) = Field(LX, LY, data, grid)
+Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
