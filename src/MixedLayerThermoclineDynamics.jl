@@ -1,6 +1,8 @@
 module MixedLayerThermoclineDynamics
 
-using DocStringExtensions
+using
+  DocStringExtensions,
+  OffsetArrays
 
 export
   AbstractGrid,
