@@ -27,8 +27,6 @@ using Test, MixedLayerThermoclineDynamics
 end
 
 @time @testset "Field tests" begin
-    include("test_fields.jl")
-
     nx, ny = 10, 12
     Lx, Ly = 2.0, 2.4
     
