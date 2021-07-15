@@ -35,21 +35,46 @@ end
     dx, dy = Lx/nx, Ly/ny
     
     grid1D = Grid1D(nx, 0, Lx)
-    hdata = zeros(nx)
-    udata = zeros(nx)
-    hdata = sin.(2*π*grid1D.xC/Lx)
-    udata = sin.(2*π*grid1D.xF/Lx)
+    grid2D = Grid2D(nx, ny, 0, Lx, 0, Ly)
+    
+    # 1D Fields
+    hdata = @. sin(2π * grid1D.xC / Lx)
+    udata = @. cos(2π * grid1D.xF / Lx)
 
     h1D = Field(Centre, hdata, grid1D)
     u1D = Field(Face, udata, grid1D)
-    @test location_centre(h1D)
-    @test location_face(u1D)
+    
+    @test typeof(h1D) <: Field1D{Centre}
+    @test typeof(u1D) <: Field1D{Face}
 
-    @test test_grid(h1D, grid1D)
-    @test test_grid(u1D, grid1D)
+    @test h1D.grid == grid1D
+    @test u1D.grid == grid1D
 
-    @test test_data(h1D, hdata)
-    @test test_data(u1D, udata)
+    @test h1D.data == hdata
+    @test u1D.data == udata
+    
+    # 2D Fields
+    hdata = [sin(2π * grid2D.xC[i]) * cos(4π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
+    udata = [cos(6π * grid2D.xF[i]) * cos(2π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
+    vdata = [sin(8π * grid2D.xC[i]) * sin(6π * grid2D.yF[j]) for i in 1:nx, j in 1:ny]
+
+    h2D = Field(Centre, Center, hdata, grid2D)
+    u2D = Field(Face, Center, udata, grid2D)
+    v2D = Field(Centre, Face, vdata, grid2D)
+    
+    @test typeof(h2D) <: Field2D{Centre, Centre}
+    @test typeof(u2D) <: Field2D{Face, Centre}
+    @test typeof(v2D) <: Field2D{Centre, Face}
+
+    @test h2D.grid == grid2D
+    @test u2D.grid == grid2D
+    @test v2D.grid == grid2D
+
+    @test h2D.data == hdata
+    @test u2D.data == udata
+    @test v2D.data == vdata
+    
+    for field in [h1D, u1D, h2D, u2D, v2D]
+        @test typeof(field) <: AbstractField
+    end
 end
-
-
