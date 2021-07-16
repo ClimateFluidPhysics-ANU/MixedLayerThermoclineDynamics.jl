@@ -27,6 +27,8 @@ using Test, MixedLayerThermoclineDynamics
 end
 
 @time @testset "Field tests" begin
+    include("test_fields.jl")
+    
     nx, ny = 10, 12
     Lx, Ly = 2.0, 2.4
     
@@ -75,4 +77,15 @@ end
     for field in [h1D, u1D, h2D, u2D, v2D]
         @test typeof(field) <: AbstractField
     end
+    
+    # test for interpolate
+    rtol_interpolate = 1e-2
+    nx, Lx = 100, 2.0
+    dx = Lx / nx
+    
+    func(x) = sin(4π * x / Lx)
+    
+    grid1D = Grid1D(nx, 0, Lx)
+
+    @test test_interpolation(func, grid1D, rtol_interpolate)
 end

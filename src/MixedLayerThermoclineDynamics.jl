@@ -15,7 +15,8 @@ export
   AbstractField,
   Field1D,
   Field2D,
-  Field
+  Field,
+  interpolate!
 
 """ Abstract supertype for grids. """
 abstract type AbstractGrid end
