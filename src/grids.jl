@@ -27,7 +27,9 @@ Construct a one-dimensional staggered `grid` on domain `x ∈ [x_start, x_end]` 
 """
 function Grid1D(Tx, nx, x_start, x_end; hx=0)
     Lx = x_end - x_start
+    
     dx = Lx/nx
+    
     xF = construct_faces(Tx, nx, hx, dx, Lx, x_start)
     xC = construct_centres(Tx, nx, hx, dx, Lx, x_start)
 
@@ -77,8 +79,9 @@ with topologies `{Tx, Ty}`, with `{nx, ny}` interior grid points, and `{hx, hy}`
 function Grid2D(Tx, Ty, nx, ny, x_start, x_end, y_start, y_end; hx=0, hy=0)
     Lx = x_end - x_start
     Ly = y_end - y_start
-    dx = Lx/nx
-    dy = Ly/ny
+    
+    dx, dy = Lx/nx, Ly/ny
+    
     xF = construct_faces(Tx, nx, hx, dx, Lx, x_start)
     xC = construct_centres(Tx, nx, hx, dx, Lx, x_start)
     yF = construct_faces(Ty, ny, hy, dy, Ly, y_start)
@@ -97,9 +100,9 @@ Returns the face locations for a dimension with topology `T`, number of grid poi
 halo points, grid spacing `d`, and extent `L`.
 """
 function construct_faces(T::AbstractTopology, n, h, d, L, start)
-    start_face = start
-    end_face = isa(T, Periodic) ? start + L - d : start + L
-    total_faces = isa(T, Periodic) ? n : n + 1
+    start_face  = start
+      end_face  = isa(T, Periodic) ? start + L - d : start + L
+    total_faces = isa(T, Periodic) ? n             : n + 1
     
     F = range(start_face - h*d, stop = end_face + h*d, length = total_faces + 2h)
     
@@ -114,7 +117,7 @@ Returns the cell centers locations for a dimension with topology `T`, number of 
 """
 function construct_centres(T::AbstractTopology, n, h, d, L, start)
     start_center = start + d/2
-    end_center = start + L - d/2
+      end_center = start + L - d/2
     
     C = range(start_center - h*d, stop = end_center + h*d, length = n + 2h)
     
