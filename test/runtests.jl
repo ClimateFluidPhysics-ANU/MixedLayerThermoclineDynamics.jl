@@ -1,29 +1,50 @@
-using Test, MixedLayerThermoclineDynamics
+using MixedLayerThermoclineDynamics, OffsetArrays, Test
 
 @time @testset "Grid tests" begin
     include("test_grids.jl")
-
-    nx, ny = 10, 12
-    Lx, Ly = 2.0, 2.4
     
-    dx, dy = Lx/nx, Ly/ny
-    
-    grid1D = Grid1D(nx, 0, Lx)
+    for Tx in (Periodic(), Bounded()), Ty in (Periodic(), Bounded())
+        
+        nx, ny = 10, 12
+        hx, hy =  1, 2
+        x0, y0 = 0.2, -0.4
+        Lx, Ly = 2.0, 2.4
+        
+        dx, dy = Lx/nx, Ly/ny
+        
+        grid1D = Grid1D(Tx, nx, x0, x0 + Lx; hx=hx)        
+        grid2D = Grid2D(Tx, Ty, nx, ny, x0, x0 + Lx, y0, y0 + Ly; hx=hx, hy=hy)
 
-    @test test_dx(grid1D, dx)
-    @test test_xF(grid1D, range(0, stop = Lx - dx, length = nx))
-    @test xdomain_length(grid1D, Lx)
+            
+        xF = isa(Tx, Periodic) ? range(x0 - hx*dx, stop = x0 + Lx - dx + hx*dx, length = nx + 2hx) :
+                                 range(x0 - hx*dx, stop = x0 + Lx + hx*dx, length = nx + 1 + 2hx)
 
-    grid2D = Grid2D(nx, ny, 0, Lx, 0, Ly)
+        xC = range(x0 + dx/2 - hx*dx, stop = x0 + Lx - dx/2 + hx*dx, length = nx + 2hx)
+        
+        yF = isa(Ty, Periodic) ? range(y0 - hy*dy, stop = y0 + Ly - dy + hy*dy, length = ny + 2hy) :
+                                 range(y0 - hy*dy, stop = y0 + Ly + hy*dy, length = ny + 1 + 2hy)
+        
+        yC = range(y0 + dy/2 - hy*dy, stop = y0 + Ly - dy/2 + hy*dy, length = ny + 2hy)
+        
+        xF = OffsetArray(xF, -hx)
+        xC = OffsetArray(xC, -hx)
+        yF = OffsetArray(yF, -hy)
+        yC = OffsetArray(yC, -hy)
+        
+        @test test_dx(grid1D, dx)
+        @test test_xF(grid1D, xF)
+        @test test_xC(grid1D, xC)
+        @test xdomain_length(grid1D, Lx)
 
-    @test test_dx(grid2D, dx)
-    @test test_dy(grid2D, dy)
-    @test test_xC(grid2D, range(dx/2, stop = Lx - dx/2, length = nx))
-    @test test_xF(grid2D, range(0, stop = Lx - dx, length = nx))
-    @test test_yF(grid2D, range(0, stop = Ly - dy, length = ny))
-    @test test_yC(grid2D, range(dy/2, stop = Ly - dy/2, length = ny))
-    @test xdomain_length(grid2D, Lx)
-    @test ydomain_length(grid2D, Ly)
+        @test test_dx(grid2D, dx)
+        @test test_dy(grid2D, dy)
+        @test test_xF(grid2D, xF)
+        @test test_xC(grid2D, xC)
+        @test test_yF(grid2D, yF)
+        @test test_yC(grid2D, yC)
+        @test xdomain_length(grid2D, Lx)
+        @test ydomain_length(grid2D, Ly)
+    end
 end
 
 @time @testset "Field tests" begin
@@ -32,8 +53,8 @@ end
     
     dx, dy = Lx/nx, Ly/ny
     
-    grid1D = Grid1D(nx, 0, Lx)
-    grid2D = Grid2D(nx, ny, 0, Lx, 0, Ly)
+    grid1D = Grid1D(Periodic(), nx, 0, Lx)
+    grid2D = Grid2D(Periodic(), Periodic(), nx, ny, 0, Lx, 0, Ly)
     
     # 1D Fields
     hdata = @. sin(2π * grid1D.xC / Lx)
