@@ -1,9 +1,14 @@
 module MixedLayerThermoclineDynamics
 
-using DocStringExtensions
+using
+  DocStringExtensions,
+  OffsetArrays
 
 export
   AbstractGrid,
+  AbstractTopology,
+  Periodic,
+  Bounded,
   Grid1D,
   Grid2D,
   
@@ -17,6 +22,15 @@ export
   Field2D,
   Field,
   interpolate!
+
+""" Abstract supertype for topology of grids. """
+abstract type AbstractTopology end
+
+""" Type for location at the cell centres. """
+struct Periodic <: AbstractTopology end 
+
+""" Type for location at the cell centres. """
+struct Bounded <: AbstractTopology end 
 
 """ Abstract supertype for grids. """
 abstract type AbstractGrid end
