@@ -23,7 +23,7 @@ end
 
 function Field1D(LX, data, grid)
 
-    return Field1D{typeof(LX)}(fill_halos(data, grid, LX), grid)
+    return Field1D{LX}(fill_halos(data, grid, LX), grid)
 end
 
 """
@@ -61,7 +61,7 @@ Constructs a 2D field of `data` at location `(LX, LY)` on `grid`.
 """
 Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
 
-function fill_halos(data, grid::Grid1D{Periodic}, LX::Centre)
+function fill_halos(data, grid::Grid1D{Periodic}, LX::Type{Centre})
     nx, hx, dx = grid.nx, grid.hx, grid.dx
     offsetData = zero(grid.xC)
     
@@ -76,7 +76,7 @@ function fill_halos(data, grid::Grid1D{Periodic}, LX::Centre)
     return offsetData
 end
 
-function fill_halos(data, grid::Grid1D{Periodic}, LX::Face)
+function fill_halos(data, grid::Grid1D{Periodic}, LX::Type{Face})
     nx, hx, dx = grid.nx, grid.hx, grid.dx
     offsetData = zero(grid.xF)
 
