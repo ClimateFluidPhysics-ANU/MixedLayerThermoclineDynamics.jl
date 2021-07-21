@@ -48,8 +48,10 @@ using MixedLayerThermoclineDynamics, OffsetArrays, Test
 end
 
 @time @testset "Field tests" begin
-    nx, ny = 10, 12
-    Lx, Ly = 2.0, 2.4
+
+    include("test_fields.jl")
+    nx, ny = 20, 24
+    Lx, Ly = 1.0, 1.2
     
     dx, dy = Lx/nx, Ly/ny
     
@@ -59,9 +61,15 @@ end
     # 1D Fields
     hdata = @. sin(2π * grid1D.xC / Lx)
     udata = @. cos(2π * grid1D.xF / Lx)
+    𝐼hdata = @. sin(2π * grid1D.xF / Lx)
+    𝐼udata = @. cos(2π * grid1D.xC / Lx)
 
     h1D = Field(Centre, hdata, grid1D)
     u1D = Field(Face, udata, grid1D)
+    𝐼hactual1D = Field(Face, 𝐼hdata, grid1D)
+    𝐼uactual1D = Field(Centre, 𝐼udata, grid1D)
+    𝐼htest1D = Field(Face, zero(hdata), grid1D)
+    𝐼utest1D = Field(Centre, zero(udata), grid1D)
     
     @test typeof(h1D) <: Field1D{Centre}
     @test typeof(u1D) <: Field1D{Face}
@@ -71,16 +79,33 @@ end
 
     @test h1D.data == hdata
     @test u1D.data == udata
+
+    @test test_𝐼x(𝐼uactual1D, 𝐼utest1D, u1D)
+    @test test_𝐼x(𝐼hactual1D, 𝐼htest1D, h1D)
     
     # 2D Fields
-    hdata = [sin(2π * grid2D.xC[i]) * cos(4π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
-    udata = [cos(6π * grid2D.xF[i]) * cos(2π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
-    vdata = [sin(8π * grid2D.xC[i]) * sin(6π * grid2D.yF[j]) for i in 1:nx, j in 1:ny]
+    hdata = @. [sin(2π * grid2D.xC[i]) * cos(4π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
+    udata = @. [cos(6π * grid2D.xF[i]) * cos(2π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
+    vdata = @. [sin(8π * grid2D.xC[i]) * sin(6π * grid2D.yF[j]) for i in 1:nx, j in 1:ny]
+
+    𝐼hudata = @. [sin(2π * grid2D.xF[i]) * cos(4π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
+    𝐼hvdata = @. [sin(2π * grid2D.xC[i]) * cos(4π * grid2D.yF[j]) for i in 1:nx, j in 1:ny]
+    𝐼udata = @. [cos(6π * grid2D.xC[i]) * cos(2π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
+    𝐼vdata = @. [sin(8π * grid2D.xC[i]) * sin(6π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
 
     h2D = Field(Centre, Center, hdata, grid2D)
     u2D = Field(Face, Center, udata, grid2D)
     v2D = Field(Centre, Face, vdata, grid2D)
-    
+
+    𝐼huactual2D = Field(Face, Centre, 𝐼hudata, grid2D)
+    𝐼hvactual2D = Field(Centre, Face, 𝐼hvdata, grid2D)
+    𝐼uactual2D = Field(Centre, Centre, 𝐼udata, grid2D)
+    𝐼vactual2D = Field(Centre, Centre, 𝐼vdata, grid2D)
+    𝐼hutest2D = Field(Face, Centre, zero(𝐼hudata), grid2D)
+    𝐼hvtest2D = Field(Centre, Face, zero(𝐼hvdata), grid2D)
+    𝐼utest2D = Field(Centre, Centre, zero(𝐼udata), grid2D)
+    𝐼vtest2D = Field(Centre, Centre, zero(𝐼vdata), grid2D)
+
     @test typeof(h2D) <: Field2D{Centre, Centre}
     @test typeof(u2D) <: Field2D{Face, Centre}
     @test typeof(v2D) <: Field2D{Centre, Face}
@@ -96,4 +121,10 @@ end
     for field in [h1D, u1D, h2D, u2D, v2D]
         @test typeof(field) <: AbstractField
     end
+
+    @test test_𝐼x(𝐼huactual2D, 𝐼hutest2D, h2D)
+    @test test_𝐼y(𝐼hvactual2D, 𝐼hvtest2D, h2D)
+    @test test_𝐼x(𝐼uactual2D, 𝐼utest2D, u2D)
+    @test test_𝐼y(𝐼vactual2D, 𝐼vtest2D, v2D)
+
 end
