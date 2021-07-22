@@ -8,7 +8,7 @@ Center = Centre
 struct Face <: AbstractLocation end 
 
 """
-    struct Field1D{LX<:AbstractLocation}
+    struct Field1D{LX<:AbstractLocation, G}
 
 A field datatype for 1D objects.
 
@@ -24,7 +24,7 @@ struct Field1D{LX<:AbstractLocation, G} <: AbstractField
 end
 
 """
-    struct Field2D{LX<:AbstractLocation, LY<:AbstractLocation}
+    struct Field2D{LX<:AbstractLocation, LY<:AbstractLocation, G}
 
 A field datatype for 2D objects.
 
@@ -67,7 +67,7 @@ Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
 """
     𝐼x!(output::Field1D{Centre}, input::Field1D{Face})
 
-Interpolates a 1D field of `data` from Face to Centre.
+Interpolates a 1D field of `data` from face to centre in x-direction.
 """
 function 𝐼x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
     nx = input.grid.nx
@@ -81,7 +81,7 @@ end
 """
     𝐼x!(output::Field1D{Face}, input::Field1D{Centre})
 
-Interpolates a 1D field of `data` from Centre to Face.
+Interpolates a 1D field of `data` from centre to face in x-direction.
 """
 function 𝐼x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
     nx = input.grid.nx
@@ -95,7 +95,7 @@ end
 """
     𝐼x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre})
 
-Interpolates a 2D field of `data` from T to U grid.
+Interpolates a 2D field of `data` from centre to face in x-direction.
 """
 function 𝐼x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
@@ -114,7 +114,7 @@ end
 """
     𝐼x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre})
 
-Interpolates a 2D field of `data` from U to T grid.
+Interpolates a 2D field of `data` from face to centre in x-direction.
 """
 function 𝐼x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
@@ -133,7 +133,7 @@ end
 """
     𝐼y!(output::Field1D{Centre, Face}, input::Field2D{Centre, Centre})
 
-Interpolates a 2D field of `data` from T to V grid.
+Interpolates a 2D field of `data` from centre to face in y-direction.
 """
 function 𝐼y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
@@ -149,7 +149,7 @@ end
 """
     𝐼y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face})
 
-Interpolates a 2D field of `data` from V to T grid.
+Interpolates a 2D field of `data` from face to centre in y-direction.
 """
 function 𝐼y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
@@ -176,7 +176,7 @@ end
 """
     ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
 
-Interpolates a 1D field of `data` from face to centre grid.
+Interpolates a 1D field of `data` from face to centre in x-direction.
 """
 function ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
     nx = input.grid.nx
@@ -191,7 +191,7 @@ end
 """
     ∂x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
 
-Interpolates a 1D field of `data` from centre to face grid.
+Interpolates a 1D field of `data` from centre to face in x-direction.
 """
 function ∂x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
     nx = input.grid.nx
