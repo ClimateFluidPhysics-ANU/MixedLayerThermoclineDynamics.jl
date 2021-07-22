@@ -84,14 +84,14 @@ end
     @test test_𝐼x(𝐼hactual1D, 𝐼htest1D, h1D)
     
     # 2D Fields
-    hdata = @. [sin(2π * grid2D.xC[i]) * cos(4π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
-    udata = @. [cos(6π * grid2D.xF[i]) * cos(2π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
-    vdata = @. [sin(8π * grid2D.xC[i]) * sin(6π * grid2D.yF[j]) for i in 1:nx, j in 1:ny]
+    hdata = @. [sin(2π * grid2D.xC[i]/Lx) * cos(4π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
+    udata = @. [cos(6π * grid2D.xF[i]/Lx) * cos(2π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
+    vdata = @. [sin(8π * grid2D.xC[i]/Lx) * sin(6π * grid2D.yF[j]/Ly) for i in 1:nx, j in 1:ny]
 
-    𝐼hudata = @. [sin(2π * grid2D.xF[i]) * cos(4π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
-    𝐼hvdata = @. [sin(2π * grid2D.xC[i]) * cos(4π * grid2D.yF[j]) for i in 1:nx, j in 1:ny]
-    𝐼udata = @. [cos(6π * grid2D.xC[i]) * cos(2π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
-    𝐼vdata = @. [sin(8π * grid2D.xC[i]) * sin(6π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
+    𝐼hudata = @. [sin(2π * grid2D.xF[i]/Lx) * cos(4π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
+    𝐼hvdata = @. [sin(2π * grid2D.xC[i]/Lx) * cos(4π * grid2D.yF[j]/Ly) for i in 1:nx, j in 1:ny]
+    𝐼udata = @. [cos(6π * grid2D.xC[i]/Lx) * cos(2π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
+    𝐼vdata = @. [sin(8π * grid2D.xC[i]/Lx) * sin(6π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
 
     h2D = Field(Centre, Center, hdata, grid2D)
     u2D = Field(Face, Center, udata, grid2D)
