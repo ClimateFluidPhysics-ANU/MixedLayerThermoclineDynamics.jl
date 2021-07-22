@@ -14,13 +14,19 @@ A field datatype for 1D objects.
 
 $(TYPEDFIELDS)
 """
-struct Field1D{LX<:AbstractLocation} <: AbstractField
+struct Field1D{LX<:AbstractLocation, G} <: AbstractField
     "Array with the values of the field."
-    data :: Array
+    data
     "The grid on which the field lives."
-    grid :: Grid1D
+    grid :: G
     
-    Field1D(LX, data, grid) = new{LX}(data, grid)    
+    #Field1D(LX, data, grid) = new{LX, G}(data, grid)    
+end
+
+function Field1D(LX, data, grid::Grid1D)
+    
+    construct_halos!(data, grid)
+    return Field1D{LX, typeof(grid)}(data, grid)
 end
 
 """
@@ -36,7 +42,7 @@ struct Field2D{LX<:AbstractLocation, LY<:AbstractLocation} <: AbstractField
     "The grid on which the field lives."
     grid :: Grid2D
     
-    Field2D(LX, LY, data, grid) = new{LX, LY}(data, grid)    
+    Field2D(LX, LY, data, grid) = new{LX, LY}(data, grid)
 end
 
 """
@@ -52,3 +58,22 @@ Field(LX, data, grid::Grid1D) = Field1D(LX, data, grid)
 Constructs a 2D field of `data` at location `(LX, LY)` on `grid`.
 """
 Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
+
+function construct_halos!(array, grid)
+    hx = grid.hx
+
+    for i in 1:hx
+        pushfirst!(array, 0.0)
+        push!(array, 0.0)
+    end
+    OffsetArray(array, -hx)
+end
+
+function fill_halos(input::Field1D{Centre, Grid1D{Periodic}})
+    nx, hx, dx = grid.nx, grid.hx, grid.dx
+
+    for j in 1:hx
+        input.data[nx+j] = input.data[j]
+        input.data[-j+1] = input.data[nx-j+1]
+    end
+end
