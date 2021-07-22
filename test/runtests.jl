@@ -45,15 +45,18 @@ using MixedLayerThermoclineDynamics, OffsetArrays, Test
         @test xdomain_length(grid2D, Lx)
         @test ydomain_length(grid2D, Ly)
     end
+
 end
 
 @time @testset "Field tests" begin
+    include("test_fields.jl")
     nx, ny = 10, 12
     Lx, Ly = 2.0, 2.4
+    hx, hy = 2, 3
     
     dx, dy = Lx/nx, Ly/ny
     
-    grid1D = Grid1D(Periodic(), nx, 0, Lx)
+    grid1D = Grid1D(Periodic(), nx, 0, Lx; hx = hx)
     grid2D = Grid2D(Periodic(), Periodic(), nx, ny, 0, Lx, 0, Ly)
     
     # 1D Fields
@@ -63,14 +66,39 @@ end
     h1D = Field(Centre, hdata, grid1D)
     u1D = Field(Face, udata, grid1D)
     
-    @test typeof(h1D) <: Field1D{Centre}
-    @test typeof(u1D) <: Field1D{Face}
+    @test typeof(h1D) <: Field1D{Centre, Grid1D{Periodic}}
+    @test typeof(u1D) <: Field1D{Face, Grid1D{Periodic}}
 
     @test h1D.grid == grid1D
     @test u1D.grid == grid1D
 
-    @test h1D.data == hdata
-    @test u1D.data == udata
+    #@test h1D.data == hdata
+    #@test u1D.data == udata
+
+    hdata_with_halos = zeros(nx + 2*hx)
+    hdata_with_halos = OffsetArray(hdata_with_halos, -hx)
+
+    for i in 1:nx
+        hdata_with_halos[i] = hdata[i]
+    end
+    for j in 1:hx
+        hdata_with_halos[nx+j] = hdata[j]
+        hdata_with_halos[-j+1] = hdata[nx-j+1]
+    end
+
+    udata_with_halos = zeros(nx + 2*hx)
+    udata_with_halos = OffsetArray(udata_with_halos, -hx)
+
+    for i in 1:nx
+        udata_with_halos[i] = udata[i]
+    end
+    for j in 1:hx
+        udata_with_halos[nx+j] = udata[j]
+        udata_with_halos[-j+1] = udata[nx-j+1]
+    end
+    
+    @test test_halos(h1D, hdata_with_halos)
+    @test test_halos(u1D, udata_with_halos)
     
     # 2D Fields
     hdata = [sin(2π * grid2D.xC[i]) * cos(4π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
@@ -96,4 +124,5 @@ end
     for field in [h1D, u1D, h2D, u2D, v2D]
         @test typeof(field) <: AbstractField
     end
+
 end
