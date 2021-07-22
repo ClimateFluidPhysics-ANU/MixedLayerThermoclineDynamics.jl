@@ -61,23 +61,13 @@ Constructs a 2D field of `data` at location `(LX, LY)` on `grid`.
 """
 Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
 
-function construct_halos(new_array, old_array, grid::Grid1D)
-    hx = grid.hx
-
-    for i in 1:hx
-        pushfirst!(array, 0.0)
-        push!(array, 0.0)
-    end
-    return OffsetArray(new_array, -hx)
-end
-
 function fill_halos!(input::Field1D{Centre, Grid1D{Periodic}}, data::AbstractArray)
     nx, hx, dx = input.grid.nx, input.grid.hx, input.grid.dx
 
     for i in 1:nx
         input.data[i] = data[i]
     end
-    
+
     for j in 1:hx
         input.data[nx+j] = data[j]
         input.data[-j+1] = data[nx-j+1]
