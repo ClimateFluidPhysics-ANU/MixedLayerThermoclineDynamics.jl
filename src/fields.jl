@@ -53,8 +53,9 @@ Constructs a 2D field of `data` at location `(LX, LY)` on `grid`.
 """
 Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
 
-############################################################################
-#-------------------------------Interpolation------------------------------#
+#####
+##### Intepolations
+#####
 
 𝐼xᶠ(i, f::Field1D{Face})   = (f.data[i] + f.data[i+1]) / 2
 𝐼xᶜ(i, f::Field1D{Centre}) = (f.data[i] + f.data[i-1]) / 2
