@@ -163,8 +163,9 @@ function 𝐼y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Gr
     end
 end
 
-############################################################################
-#--------------------------------Derivatives-------------------------------#
+#####
+##### Derivatives
+#####
 
 δxᶠ(i, f::Field1D{Face})   = f.data[i+1] - f.data[i]
 δxᶜ(i, f::Field1D{Centre}) = f.data[i] - f.data[i-1]
