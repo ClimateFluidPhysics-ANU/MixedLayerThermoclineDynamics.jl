@@ -61,15 +61,25 @@ end
     # 1D Fields
     hdata = @. sin(2π * grid1D.xC / Lx)
     udata = @. cos(2π * grid1D.xF / Lx)
+    
     𝐼hdata = @. sin(2π * grid1D.xF / Lx)
     𝐼udata = @. cos(2π * grid1D.xC / Lx)
 
+    ∂hdata = @. (2π/Lx) * cos(2π * grid1D.xF / Lx)
+    ∂udata = @. -(2π/Lx) * sin(2π * grid1D.xC / Lx)
+
     h1D = Field(Centre, hdata, grid1D)
     u1D = Field(Face, udata, grid1D)
+
     𝐼hactual1D = Field(Face, 𝐼hdata, grid1D)
     𝐼uactual1D = Field(Centre, 𝐼udata, grid1D)
     𝐼htest1D = Field(Face, zero(hdata), grid1D)
     𝐼utest1D = Field(Centre, zero(udata), grid1D)
+
+    ∂hactual1D = Field(Face, ∂hdata, grid1D)
+    ∂uactual1D = Field(Centre, ∂udata, grid1D)
+    ∂htest1D = Field(Face, zero(hdata), grid1D)
+    ∂utest1D = Field(Centre, zero(udata), grid1D)
     
     @test typeof(h1D) <: Field1D{Centre}
     @test typeof(u1D) <: Field1D{Face}
@@ -82,6 +92,9 @@ end
 
     @test test_𝐼x(𝐼uactual1D, 𝐼utest1D, u1D)
     @test test_𝐼x(𝐼hactual1D, 𝐼htest1D, h1D)
+
+    @test test_∂x(∂uactual1D, ∂utest1D, u1D)
+    @test test_∂x(∂hactual1D, ∂htest1D, h1D)
     
     # 2D Fields
     hdata = @. [sin(2π * grid2D.xC[i]/Lx) * cos(4π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
@@ -92,6 +105,11 @@ end
     𝐼hvdata = @. [sin(2π * grid2D.xC[i]/Lx) * cos(4π * grid2D.yF[j]/Ly) for i in 1:nx, j in 1:ny]
     𝐼udata = @. [cos(6π * grid2D.xC[i]/Lx) * cos(2π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
     𝐼vdata = @. [sin(8π * grid2D.xC[i]/Lx) * sin(6π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
+
+    ∂hudata = @. (2π/Lx) * [cos(2π * grid2D.xF[i]/Lx) * cos(4π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
+    ∂hvdata = @. (-4π/Ly) * [sin(2π * grid2D.xC[i]/Lx) * sin(4π * grid2D.yF[j]/Ly) for i in 1:nx, j in 1:ny]
+    ∂udata = @. (-6π/Lx) * [sin(6π * grid2D.xC[i]/Lx) * cos(2π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
+    ∂vdata = @. (6π/Ly) * [sin(8π * grid2D.xC[i]/Lx) * cos(6π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
 
     h2D = Field(Centre, Center, hdata, grid2D)
     u2D = Field(Face, Center, udata, grid2D)
@@ -105,6 +123,15 @@ end
     𝐼hvtest2D = Field(Centre, Face, zero(𝐼hvdata), grid2D)
     𝐼utest2D = Field(Centre, Centre, zero(𝐼udata), grid2D)
     𝐼vtest2D = Field(Centre, Centre, zero(𝐼vdata), grid2D)
+
+    ∂huactual2D = Field(Face, Centre, ∂hudata, grid2D)
+    ∂hvactual2D = Field(Centre, Face, ∂hvdata, grid2D)
+    ∂uactual2D = Field(Centre, Centre, ∂udata, grid2D)
+    ∂vactual2D = Field(Centre, Centre, ∂vdata, grid2D)
+    ∂hutest2D = Field(Face, Centre, zero(∂hudata), grid2D)
+    ∂hvtest2D = Field(Centre, Face, zero(∂hvdata), grid2D)
+    ∂utest2D = Field(Centre, Centre, zero(∂udata), grid2D)
+    ∂vtest2D = Field(Centre, Centre, zero(∂vdata), grid2D)
 
     @test typeof(h2D) <: Field2D{Centre, Centre}
     @test typeof(u2D) <: Field2D{Face, Centre}
@@ -126,5 +153,10 @@ end
     @test test_𝐼y(𝐼hvactual2D, 𝐼hvtest2D, h2D)
     @test test_𝐼x(𝐼uactual2D, 𝐼utest2D, u2D)
     @test test_𝐼y(𝐼vactual2D, 𝐼vtest2D, v2D)
+
+    @test test_∂x(∂huactual2D, ∂hutest2D, h2D)
+    @test test_∂y(∂hvactual2D, ∂hvtest2D, h2D)
+    @test test_∂x(∂uactual2D, ∂utest2D, u2D)
+    @test test_∂y(∂vactual2D, ∂vtest2D, v2D)
 
 end
