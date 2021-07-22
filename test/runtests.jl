@@ -50,7 +50,7 @@ end
 @time @testset "Field tests" begin
 
     include("test_fields.jl")
-    nx, ny = 20, 24
+    nx, ny = 100, 120
     Lx, Ly = 1.0, 1.2
     
     dx, dy = Lx/nx, Ly/ny
