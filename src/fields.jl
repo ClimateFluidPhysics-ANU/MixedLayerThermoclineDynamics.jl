@@ -53,16 +53,17 @@ Constructs a 2D field of `data` at location `(LX, LY)` on `grid`.
 """
 Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
 
-############################################################################
-#-------------------------------Interpolation------------------------------#
+#####
+##### Intepolations
+#####
 
-𝐼xᶠ(i::Int, f::Field1D{Face})   = (f.data[i] + f.data[i+1]) / 2
-𝐼xᶜ(i::Int, f::Field1D{Centre}) = (f.data[i] + f.data[i-1]) / 2
+𝐼xᶠ(i, f::Field1D{Face})   = (f.data[i] + f.data[i+1]) / 2
+𝐼xᶜ(i, f::Field1D{Centre}) = (f.data[i] + f.data[i-1]) / 2
 
-𝐼xᶠ(i::Int, j::Int, f::Field2D{Face, Centre})   = (f.data[i, j] + f.data[i+1, j]) / 2
-𝐼xᶜ(i::Int, j::Int, f::Field2D{Centre, Centre}) = (f.data[i, j] + f.data[i-1, j]) / 2
-𝐼yᶠ(i::Int, j::Int, f::Field2D{Centre, Face})   = (f.data[i, j+1] + f.data[i, j]) / 2
-𝐼yᶜ(i::Int, j::Int, f::Field2D{Centre, Centre}) = (f.data[i, j] + f.data[i, j-1]) / 2
+𝐼xᶠ(i, j, f::Field2D{Face, Centre})   = (f.data[i, j] + f.data[i+1, j]) / 2
+𝐼xᶜ(i, j, f::Field2D{Centre, Centre}) = (f.data[i, j] + f.data[i-1, j]) / 2
+𝐼yᶠ(i, j, f::Field2D{Centre, Face})   = (f.data[i, j+1] + f.data[i, j]) / 2
+𝐼yᶜ(i, j, f::Field2D{Centre, Centre}) = (f.data[i, j] + f.data[i, j-1]) / 2
 
 """
     𝐼x!(output::Field1D{Centre}, input::Field1D{Face})
@@ -162,8 +163,9 @@ function 𝐼y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Gr
     end
 end
 
-############################################################################
-#--------------------------------Derivatives-------------------------------#
+#####
+##### Derivatives
+#####
 
 δxᶠ(i, f::Field1D{Face})   = f.data[i+1] - f.data[i]
 δxᶜ(i, f::Field1D{Centre}) = f.data[i] - f.data[i-1]
