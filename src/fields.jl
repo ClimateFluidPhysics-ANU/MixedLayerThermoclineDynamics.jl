@@ -18,9 +18,7 @@ struct Field1D{LX<:AbstractLocation, G} <: AbstractField
     "Array with the values of the field."
     data::AbstractArray
     "The grid on which the field lives."
-    grid :: G
-    
-    #Field1D(LX, data, grid) = new{LX, G}(data, grid)    
+    grid :: G   
 end
 
 function Field1D(LX, data::AbstractArray, grid::Grid1D)

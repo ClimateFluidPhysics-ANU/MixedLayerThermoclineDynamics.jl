@@ -72,9 +72,6 @@ end
     @test h1D.grid == grid1D
     @test u1D.grid == grid1D
 
-    #@test h1D.data == hdata
-    #@test u1D.data == udata
-
     hdata_with_halos = zeros(nx + 2*hx)
     hdata_with_halos = OffsetArray(hdata_with_halos, -hx)
 
