@@ -216,8 +216,8 @@ function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Gri
         output.data[nx, j] = (input.data[1, j] - input.data[nx, j]) / dx
     end
 
-    for j in 1:ny, 1:nx-1
-        output.data[i, j] = δxᶠᶜ(i, j, input)/dx
+    for j in 1:ny, i = 1:nx-1
+        output.data[i, j] = δxᶠᶜ(i, j, input) / dx
     end
 end
 
