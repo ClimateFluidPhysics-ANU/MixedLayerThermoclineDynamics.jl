@@ -57,13 +57,13 @@ Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
 ##### Intepolations
 #####
 
-𝐼xᶠ(i, f::Field1D{Face})   = (f.data[i] + f.data[i+1]) / 2
-𝐼xᶜ(i, f::Field1D{Centre}) = (f.data[i] + f.data[i-1]) / 2
+𝐼xᶜ(i, f::Field1D{Face})   = (f.data[i] + f.data[i+1]) / 2
+𝐼xᶠ(i, f::Field1D{Centre}) = (f.data[i] + f.data[i-1]) / 2
 
-𝐼xᶠᶜ(i, j, f::Field2D{Face, Centre})   = (f.data[i, j] + f.data[i+1, j]) / 2
-𝐼xᶜᶜ(i, j, f::Field2D{Centre, Centre}) = (f.data[i, j] + f.data[i-1, j]) / 2
-𝐼yᶜᶠ(i, j, f::Field2D{Centre, Face})   = (f.data[i, j+1] + f.data[i, j]) / 2
-𝐼yᶜᶜ(i, j, f::Field2D{Centre, Centre}) = (f.data[i, j] + f.data[i, j-1]) / 2
+𝐼xᶜᶜ(i, j, f::Field2D{Face, Centre})   = (f.data[i, j] + f.data[i+1, j]) / 2
+𝐼xᶠᶜ(i, j, f::Field2D{Centre, Centre}) = (f.data[i, j] + f.data[i-1, j]) / 2
+𝐼yᶜᶜ(i, j, f::Field2D{Centre, Face})   = (f.data[i, j+1] + f.data[i, j]) / 2
+𝐼yᶜᶠ(i, j, f::Field2D{Centre, Centre}) = (f.data[i, j] + f.data[i, j-1]) / 2
 
 """
     𝐼x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
@@ -75,7 +75,7 @@ function 𝐼x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
         
     output.data[nx] = (input.data[1] + input.data[nx]) / 2
     for i in 1:nx-1
-        output.data[i] = 𝐼xᶠ(i, input)
+        output.data[i] = 𝐼xᶜ(i, input)
     end
 end
 
@@ -89,7 +89,7 @@ function 𝐼x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
         
     output.data[1] = (input.data[1] + input.data[nx]) / 2
     for i in 2:nx
-        output.data[i] = 𝐼xᶜ(i, input)
+        output.data[i] = 𝐼xᶠ(i, input)
     end
 end
 
@@ -106,7 +106,7 @@ function 𝐼x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Gr
     end
 
     for j in 1:ny, i in 2:nx
-        output.data[i, j] = 𝐼xᶜᶜ(i, j, input)
+        output.data[i, j] = 𝐼xᶠᶜ(i, j, input)
     end
 end
 
@@ -123,7 +123,7 @@ function 𝐼x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Gr
     end
 
     for j in 1:ny, i in 1:nx-1
-        output.data[i, j] = 𝐼xᶠᶜ(i, j, input)
+        output.data[i, j] = 𝐼xᶜᶜ(i, j, input)
     end
 end
 
@@ -140,7 +140,7 @@ function 𝐼y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Gr
     end
     
     for j in 2:ny, i in 1:nx
-        output.data[i, j] = 𝐼yᶜᶜ(i, j, input)
+        output.data[i, j] = 𝐼yᶜᶠ(i, j, input)
     end
 end
 
@@ -157,7 +157,7 @@ function 𝐼y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Gr
     end
     
     for j in 1:ny-1, i in 1:nx
-        output.data[i, j] = 𝐼yᶜᶠ(i, j, input)
+        output.data[i, j] = 𝐼yᶜᶜ(i, j, input)
     end
 end
 
@@ -165,13 +165,13 @@ end
 ##### Derivatives
 #####
 
-δxᶠ(i, f::Field1D{Face})   = f.data[i+1] - f.data[i]
-δxᶜ(i, f::Field1D{Centre}) = f.data[i] - f.data[i-1]
+δxᶜ(i, f::Field1D{Face})   = f.data[i+1] - f.data[i]
+δxᶠ(i, f::Field1D{Centre}) = f.data[i] - f.data[i-1]
 
-δxᶠᶜ(i, j, f::Field2D{Face, Centre})   = f.data[i+1, j] - f.data[i, j]
-δxᶜᶜ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j] - f.data[i-1, j]
-δyᶜᶠ(i, j, f::Field2D{Centre, Face})   = f.data[i, j+1] - f.data[i, j]
-δyᶜᶜ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j] - f.data[i, j-1]
+δxᶜᶜ(i, j, f::Field2D{Face, Centre})   = f.data[i+1, j] - f.data[i, j]
+δxᶠᶜ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j] - f.data[i-1, j]
+δyᶜᶜ(i, j, f::Field2D{Centre, Face})   = f.data[i, j+1] - f.data[i, j]
+δyᶜᶠ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j] - f.data[i, j-1]
 
 """
     ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
@@ -184,7 +184,7 @@ function ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
         
     output.data[nx] = (input.data[1] - input.data[nx]) / dx
     for i in 1:nx-1
-        output.data[i] = δxᶠ(i, input) / dx
+        output.data[i] = δxᶜ(i, input) / dx
     end
 end
 
@@ -199,7 +199,7 @@ function ∂x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
 
     output.data[1] = (input.data[1] - input.data[nx]) / dx
     for i in 2:nx
-        output.data[i] = δxᶜ(i, input) / dx
+        output.data[i] = δxᶠ(i, input) / dx
     end
 end
 
@@ -217,7 +217,7 @@ function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Gri
     end
 
     for j in 1:ny, i = 1:nx-1
-        output.data[i, j] = δxᶠᶜ(i, j, input) / dx
+        output.data[i, j] = δxᶜᶜ(i, j, input) / dx
     end
 end
 
@@ -235,7 +235,7 @@ function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Gri
     end
 
     for j in 1:ny, i in 2:nx
-        output.data[i, j] = δxᶜᶜ(i, j, input)/dx
+        output.data[i, j] = δxᶠᶜ(i, j, input)/dx
     end
 end
 
@@ -253,7 +253,7 @@ function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Gri
     end
 
     for j in 1:ny-1, i in 1:nx
-        output.data[i, j] = δyᶜᶠ(i, j, input) / dy
+        output.data[i, j] = δyᶜᶜ(i, j, input) / dy
     end
 end
 
@@ -271,6 +271,6 @@ function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Gri
     end
 
     for j in 2:ny, i in 1:nx
-        output.data[i, j] = δyᶜᶜ(i, j, input)/dy
+        output.data[i, j] = δyᶜᶠ(i, j, input)/dy
     end
 end
