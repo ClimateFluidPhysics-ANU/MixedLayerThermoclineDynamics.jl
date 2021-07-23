@@ -82,16 +82,3 @@ function fill_halos!(field::Field1D{<:Any, Grid1D{Periodic}})
 
     return nothing
  end
-
-function fill_halos!(input::Field1D{Face, Grid1D{Periodic}}, data::AbstractArray)
-    nx, hx, dx = input.grid.nx, input.grid.hx, input.grid.dx
-
-    for i in 1:nx
-        input.data[i] = data[i]
-    end
-
-    for j in 1:hx
-        input.data[nx+j] = data[j]
-        input.data[-j+1] = data[nx-j+1]
-    end
-end
