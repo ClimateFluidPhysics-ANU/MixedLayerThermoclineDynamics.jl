@@ -25,9 +25,13 @@ end
 
 function Field1D(LX, data::AbstractArray, grid::Grid1D)
     
-    new_data = OffsetArray(zeros(grid.nx + 2*grid.hx), -grid.hx)
-    field = Field1D{LX, typeof(grid)}(new_data, grid)
-    fill_halos!(field, data)
+    data_with_halos = OffsetArray(zeros(grid.nx + 2*grid.hx), -grid.hx)
+    @. data_with_halos[1:nx] = data
+
+    field = Field1D{LX, typeof(grid)}(data_with_halos, grid)
+
+    fill_halos!(field)
+
     return field
 end
 
