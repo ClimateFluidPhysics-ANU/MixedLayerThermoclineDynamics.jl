@@ -72,12 +72,12 @@ Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
 #####
 
 𝐼xᶜ(i, f::Field1D{Face})   = (f.data[i] + f.data[i+1]) / 2
-𝐼xᶠ(i, f::Field1D{Centre}) = (f.data[i] + f.data[i-1]) / 2
+𝐼xᶠ(i, f::Field1D{Centre}) = (f.data[i-1] + f.data[i]) / 2
 
 𝐼xᶜᶜ(i, j, f::Field2D{Face, Centre})   = (f.data[i, j] + f.data[i+1, j]) / 2
-𝐼xᶠᶜ(i, j, f::Field2D{Centre, Centre}) = (f.data[i, j] + f.data[i-1, j]) / 2
-𝐼yᶜᶜ(i, j, f::Field2D{Centre, Face})   = (f.data[i, j+1] + f.data[i, j]) / 2
-𝐼yᶜᶠ(i, j, f::Field2D{Centre, Centre}) = (f.data[i, j] + f.data[i, j-1]) / 2
+𝐼xᶠᶜ(i, j, f::Field2D{Centre, Centre}) = (f.data[i-1, j] + f.data[i, j]) / 2
+𝐼yᶜᶜ(i, j, f::Field2D{Centre, Face})   = (f.data[i, j] + f.data[i, j+1]) / 2
+𝐼yᶜᶠ(i, j, f::Field2D{Centre, Centre}) = (f.data[i, j-1] + f.data[i, j]) / 2
 
 """
     𝐼x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
@@ -86,11 +86,14 @@ Interpolates a 1D `input` field that lives on `Face`s to `output` field that liv
 """
 function 𝐼x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
     nx = input.grid.nx
-        
-    output.data[nx] = (input.data[1] + input.data[nx]) / 2
-    for i in 1:nx-1
+    
+    for i in 1:nx
         output.data[i] = 𝐼xᶜ(i, input)
     end
+    
+    fill_halos!(output)
+    
+    return nothing
 end
 
 """
@@ -100,11 +103,14 @@ Interpolates a 1D `input` field that lives on `Centre`s to `output` field that l
 """
 function 𝐼x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
     nx = input.grid.nx
-        
-    output.data[1] = (input.data[1] + input.data[nx]) / 2
-    for i in 2:nx
+    
+    for i in 1:nx
         output.data[i] = 𝐼xᶠ(i, input)
     end
+    
+    fill_halos!(output)
+    
+    return nothing
 end
 
 """
@@ -122,6 +128,8 @@ function 𝐼x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Gr
     for j in 1:ny, i in 2:nx
         output.data[i, j] = 𝐼xᶠᶜ(i, j, input)
     end
+    
+    return nothing
 end
 
 """
@@ -139,6 +147,8 @@ function 𝐼x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Gr
     for j in 1:ny, i in 1:nx-1
         output.data[i, j] = 𝐼xᶜᶜ(i, j, input)
     end
+    
+    return nothing
 end
 
 """
@@ -156,6 +166,8 @@ function 𝐼y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Gr
     for j in 2:ny, i in 1:nx
         output.data[i, j] = 𝐼yᶜᶠ(i, j, input)
     end
+    
+    return nothing
 end
 
 """
@@ -173,6 +185,8 @@ function 𝐼y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Gr
     for j in 1:ny-1, i in 1:nx
         output.data[i, j] = 𝐼yᶜᶜ(i, j, input)
     end
+    
+    return nothing
 end
 
 #####
@@ -193,13 +207,15 @@ end
 Interpolates a 1D field of `data` from face to centre in x-direction.
 """
 function ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
-    nx = input.grid.nx
-    dx = input.grid.dx
-        
-    output.data[nx] = (input.data[1] - input.data[nx]) / dx
-    for i in 1:nx-1
+    nx, dx = input.grid.nx, input.grid.dx
+    
+    for i in 1:nx
         output.data[i] = δxᶜ(i, input) / dx
     end
+    
+    fill_halos!(output)
+    
+    return nothing
 end
 
 """
@@ -208,13 +224,15 @@ end
 Interpolates a 1D field of `data` from centre to face in x-direction.
 """
 function ∂x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
-    nx = input.grid.nx
-    dx = input.grid.dx
-
-    output.data[1] = (input.data[1] - input.data[nx]) / dx
-    for i in 2:nx
+    nx, dx = input.grid.nx, input.grid.dx
+    
+    for i in 1:nx
         output.data[i] = δxᶠ(i, input) / dx
     end
+    
+    fill_halos!(output)
+    
+    return nothing
 end
 
 """
@@ -233,6 +251,8 @@ function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Gri
     for j in 1:ny, i = 1:nx-1
         output.data[i, j] = δxᶜᶜ(i, j, input) / dx
     end
+    
+    return nothing
 end
 
 """
@@ -251,6 +271,8 @@ function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Gri
     for j in 1:ny, i in 2:nx
         output.data[i, j] = δxᶠᶜ(i, j, input)/dx
     end
+    
+    return nothing
 end
 
 """
@@ -269,6 +291,8 @@ function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Gri
     for j in 1:ny-1, i in 1:nx
         output.data[i, j] = δyᶜᶜ(i, j, input) / dy
     end
+    
+    return nothing
 end
 
 """
@@ -287,6 +311,8 @@ function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Gri
     for j in 2:ny, i in 1:nx
         output.data[i, j] = δyᶜᶠ(i, j, input)/dy
     end
+    
+    return nothing
 end
 
 """
