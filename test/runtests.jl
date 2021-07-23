@@ -1,5 +1,8 @@
 using MixedLayerThermoclineDynamics, OffsetArrays, Test
 
+const rtol_interpolation = 1e-2
+const rtol_derivatives = 1e-2
+
 @time @testset "Grid tests" begin
     include("test_grids.jl")
     
