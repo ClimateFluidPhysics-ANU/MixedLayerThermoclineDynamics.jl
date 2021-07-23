@@ -65,18 +65,21 @@ Constructs a 2D field of `data` at location `(LX, LY)` on `grid`.
 """
 Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
 
-function fill_halos!(input::Field1D{Centre, Grid1D{Periodic}}, data::AbstractArray)
-    nx, hx, dx = input.grid.nx, input.grid.hx, input.grid.dx
+"""
+    fill_halos!(field::Field1D{<:Any, Grid1D{Periodic}})
 
-    for i in 1:nx
-        input.data[i] = data[i]
+Fill halos for a 1D field that lives on Faces with periodic boundary conditions.
+"""
+function fill_halos!(field::Field1D{<:Any, Grid1D{Periodic}})
+     nx, hx = field.grid.nx, field.grid.hx
+
+     for j in 1:hx
+        field.data[nx+j] = field.data[j]
+        field.data[-j+1] = field.data[nx-j+1]
     end
 
-    for j in 1:hx
-        input.data[nx+j] = data[j]
-        input.data[-j+1] = data[nx-j+1]
-    end
-end
+    return nothing
+ end
 
 function fill_halos!(input::Field1D{Face, Grid1D{Periodic}}, data::AbstractArray)
     nx, hx, dx = input.grid.nx, input.grid.hx, input.grid.dx
