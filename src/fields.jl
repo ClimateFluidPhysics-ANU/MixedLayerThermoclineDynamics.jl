@@ -80,9 +80,10 @@ Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
 𝐼yᶜᶠ(i, j, f::Field2D{Centre, Centre}) = (f.data[i, j-1] + f.data[i, j]) / 2
 
 """
-    𝐼x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
+    𝐼x!(output::Field1D{<:Any}, input::Field1D{<:Any, Grid1D{Periodic}})
 
-Interpolates a 1D `input` field that lives on `Face`s to `output` field that lives on `Centre`s.
+Interpolates a 1D `input` field to the location where the `output` field lives for 1D grids
+with periodic boundary conditions.
 """
 function 𝐼x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
     nx = input.grid.nx
@@ -96,11 +97,6 @@ function 𝐼x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
     return nothing
 end
 
-"""
-    𝐼x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
-
-Interpolates a 1D `input` field that lives on `Centre`s to `output` field that lives on `Face`s.
-"""
 function 𝐼x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
     nx = input.grid.nx
     
@@ -110,6 +106,14 @@ function 𝐼x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
     
     fill_halos!(output)
     
+    return nothing
+end
+
+function 𝐼x!(output::Field1D{LX}, input::Field1D{LX, Grid1D{Periodic}}) where LX
+    @. output.data = input.data
+    
+    fill_halos!(output)
+
     return nothing
 end
 
@@ -204,7 +208,10 @@ end
 """
     ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
 
-Interpolates a 1D field of `data` from face to centre in x-direction.
+Compute the derivative of a 1D `input` field onto the location where the `output` field lives
+for 1D grids with periodic boundary conditions.
+
+Compute the derivative of a 1D field of `data` from face to centre in x-direction.
 """
 function ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
     nx, dx = input.grid.nx, input.grid.dx
@@ -218,17 +225,44 @@ function ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
     return nothing
 end
 
-"""
-    ∂x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
-
-Interpolates a 1D field of `data` from centre to face in x-direction.
-"""
 function ∂x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
     nx, dx = input.grid.nx, input.grid.dx
     
     for i in 1:nx
         output.data[i] = δxᶠ(i, input) / dx
     end
+    
+    fill_halos!(output)
+    
+    return nothing
+end
+
+function ∂x!(output::Field1D{Centre}, input::Field1D{Centre, Grid1D{Periodic}})
+    nx, dx = input.grid.nx, input.grid.dx
+    
+    for i in 1:nx
+        output.data[i] = δxᶠ(i, input) / dx
+    end
+    
+    fill_halos!(output)
+    
+    𝐼x!(output, output)
+    
+    fill_halos!(output)
+    
+    return nothing
+end
+
+function ∂x!(output::Field1D{Face}, input::Field1D{Face, Grid1D{Periodic}})
+    nx, dx = input.grid.nx, input.grid.dx
+    
+    for i in 1:nx
+        output.data[i] = δxᶜ(i, input) / dx
+    end
+    
+    fill_halos!(output)
+    
+    𝐼x!(output, output)
     
     fill_halos!(output)
     

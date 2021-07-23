@@ -62,13 +62,13 @@ end
     
     # 1D Fields
     hdata = @. sin(2π * grid1D.xC / Lx)
-    udata = @. cos(2π * grid1D.xF / Lx)
+    udata = @. cos(4π * grid1D.xF / Lx)
     
     𝐼hdata = @. sin(2π * grid1D.xF / Lx)
-    𝐼udata = @. cos(2π * grid1D.xC / Lx)
+    𝐼udata = @. cos(4π * grid1D.xC / Lx)
 
-    ∂hdata = @. (2π/Lx) * cos(2π * grid1D.xF / Lx)
-    ∂udata = @. -(2π/Lx) * sin(2π * grid1D.xC / Lx)
+    ∂hdata = @.  (2π/Lx) * cos(2π * grid1D.xF / Lx)
+    ∂udata = @. -(4π/Lx) * sin(4π * grid1D.xC / Lx)
 
     h1D = Field(Centre, hdata, grid1D)
     u1D = Field(Face, udata, grid1D)
@@ -100,10 +100,14 @@ end
     @test u1D.grid == grid1D
 
     @test test_𝐼x(𝐼uactual1D, 𝐼utest1D, u1D)
-    @test test_𝐼x(𝐼hactual1D, 𝐼htest1D, h1D)
-
+    @test test_𝐼x(𝐼hactual1D, 𝐼htest1D, h1D)    
+    @test test_𝐼x(u1D, 𝐼htest1D, u1D)
+    @test test_𝐼x(h1D, 𝐼utest1D, h1D)
+    
     @test test_∂x(∂uactual1D, ∂utest1D, u1D)
     @test test_∂x(∂hactual1D, ∂htest1D, h1D)
+    @test test_∂x(∂uactual1D, ∂htest1D, u1D)
+    @test test_∂x(∂hactual1D, ∂utest1D, h1D)
 
     hdata_with_halos = OffsetArray(zeros(nx + 2*hx), -hx)
 
