@@ -16,7 +16,7 @@ $(TYPEDFIELDS)
 """
 struct Field1D{LX<:AbstractLocation, G} <: AbstractField
     "Array with the values of the field."
-    data::OffsetArray
+    data :: OffsetArray
     "The grid on which the field lives."
     grid :: G   
 end
