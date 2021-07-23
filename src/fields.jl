@@ -16,7 +16,7 @@ $(TYPEDFIELDS)
 """
 struct Field1D{LX<:AbstractLocation, G} <: AbstractField
     "Array with the values of the field."
-    data::AbstractArray
+    data::OffsetArray
     "The grid on which the field lives."
     grid :: G   
 end
@@ -73,9 +73,9 @@ Fill halos for a 1D field that lives on Faces with periodic boundary conditions.
 function fill_halos!(field::Field1D{<:Any, Grid1D{Periodic}})
      nx, hx = field.grid.nx, field.grid.hx
 
-     for j in 1:hx
-        field.data[nx+j] = field.data[j]
-        field.data[-j+1] = field.data[nx-j+1]
+     for i in 1:hx
+        field.data[nx+i] = field.data[i]
+        field.data[-i+1] = field.data[nx-i+1]
     end
 
     return nothing
