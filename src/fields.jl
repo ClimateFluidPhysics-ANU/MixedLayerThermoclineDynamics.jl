@@ -18,17 +18,18 @@ struct Field1D{LX<:AbstractLocation, G} <: AbstractField
     "Array with the values of the field."
     data :: OffsetArray
     "The grid on which the field lives."
-    grid :: G   
+    grid :: G
+    
+    Field1D(LX, data, grid::G) where G = new{LX, G}(data, grid)
 end
 
-function Field1D(LX, data::AbstractArray, grid::Grid1D)
+function Field1D(LX, data::Array, grid::Grid1D)
     
     data_with_halos = OffsetArray(zeros(grid.nx + 2*grid.hx), -grid.hx)
-    for i in 1:grid.nx
-        data_with_halos[i] = data[i]
-    end
-
-    field = Field1D{LX, typeof(grid)}(data_with_halos, grid)
+    
+    @. data_with_halos[1:nx] = data
+    
+    field = Field1D(LX, data_with_halos, grid)
 
     fill_halos!(field)
 
