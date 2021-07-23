@@ -49,7 +49,6 @@ using MixedLayerThermoclineDynamics, OffsetArrays, Test
 end
 
 @time @testset "Field tests" begin
-    include("test_fields.jl")
     nx, ny = 10, 12
     Lx, Ly = 2.0, 2.4
     hx, hy = 2, 3
@@ -94,8 +93,8 @@ end
         udata_with_halos[-i+1] = udata[nx-i+1]
     end
     
-    @test h1D.data == hdata_with_halos
-    @test u1D.data == udata_with_halos
+    @test h1D.data ≈ hdata_with_halos
+    @test u1D.data ≈ udata_with_halos
     
     # 2D Fields
     hdata = [sin(2π * grid2D.xC[i]) * cos(4π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
