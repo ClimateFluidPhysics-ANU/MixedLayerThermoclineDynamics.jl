@@ -69,7 +69,7 @@ Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
 """
     fill_halos!(field::Field1D{<:Any, Grid1D{Periodic}})
 
-Fill halos for a 1D field that lives on Faces with periodic boundary conditions.
+Fill halos for a 1D field that lives on a grid with periodic boundary conditions.
 """
 function fill_halos!(field::Field1D{<:Any, Grid1D{Periodic}})
      nx, hx = field.grid.nx, field.grid.hx
