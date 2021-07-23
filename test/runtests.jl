@@ -65,8 +65,18 @@ end
     h1D = Field(Centre, hdata, grid1D)
     u1D = Field(Face, udata, grid1D)
     
+    h1D_from_outer = Field1D(Centre, hdata[1:nx], grid1D)
+    u1D_from_outer = Field1D(Face, udata[1:nx], grid1D)
+    
+    @test h1D.grid == h1D_from_outer.grid
+    @test u1D.grid == u1D_from_outer.grid
+    @test h1D.data ≈ h1D_from_outer.data
+    @test u1D.data ≈ u1D_from_outer.data
+    
     @test typeof(h1D) <: Field1D{Centre}
     @test typeof(u1D) <: Field1D{Face}
+    @test typeof(h1D_from_outer) <: Field1D{Centre}
+    @test typeof(u1D_from_outer) <: Field1D{Face}
 
     @test h1D.grid == grid1D
     @test u1D.grid == grid1D

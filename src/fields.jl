@@ -24,6 +24,7 @@ struct Field1D{LX<:AbstractLocation, G} <: AbstractField
 end
 
 function Field1D(LX, data::Array, grid::Grid1D)
+    nx, hx = grid.nx, grid.hx
     
     data_with_halos = OffsetArray(zeros(grid.nx + 2*grid.hx), -grid.hx)
     
