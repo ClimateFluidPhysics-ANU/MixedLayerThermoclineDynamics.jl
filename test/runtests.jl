@@ -66,36 +66,36 @@ end
     h1D = Field(Centre, hdata, grid1D)
     u1D = Field(Face, udata, grid1D)
     
-    @test typeof(h1D) <: Field1D{Centre, Grid1D{Periodic}}
-    @test typeof(u1D) <: Field1D{Face, Grid1D{Periodic}}
+    @test typeof(h1D) <: Field1D{Centre}
+    @test typeof(u1D) <: Field1D{Face}
 
     @test h1D.grid == grid1D
     @test u1D.grid == grid1D
 
-    hdata_with_halos = zeros(nx + 2*hx)
-    hdata_with_halos = OffsetArray(hdata_with_halos, -hx)
+    hdata_with_halos = OffsetArray(zeros(nx + 2*hx), -hx)
 
     for i in 1:nx
         hdata_with_halos[i] = hdata[i]
     end
-    for j in 1:hx
-        hdata_with_halos[nx+j] = hdata[j]
-        hdata_with_halos[-j+1] = hdata[nx-j+1]
+
+    for i in 1:hx
+        hdata_with_halos[nx+i] = hdata[i]
+        hdata_with_halos[-i+1] = hdata[nx-i+1]
     end
 
-    udata_with_halos = zeros(nx + 2*hx)
-    udata_with_halos = OffsetArray(udata_with_halos, -hx)
+    udata_with_halos = OffsetArray(zeros(nx + 2*hx), -hx)
 
     for i in 1:nx
         udata_with_halos[i] = udata[i]
     end
-    for j in 1:hx
-        udata_with_halos[nx+j] = udata[j]
-        udata_with_halos[-j+1] = udata[nx-j+1]
+
+    for i in 1:hx
+        udata_with_halos[nx+i] = udata[i]
+        udata_with_halos[-i+1] = udata[nx-i+1]
     end
     
-    @test test_halos(h1D, hdata_with_halos)
-    @test test_halos(u1D, udata_with_halos)
+    @test h1D.data == hdata_with_halos
+    @test u1D.data == udata_with_halos
     
     # 2D Fields
     hdata = [sin(2π * grid2D.xC[i]) * cos(4π * grid2D.yC[j]) for i in 1:nx, j in 1:ny]
