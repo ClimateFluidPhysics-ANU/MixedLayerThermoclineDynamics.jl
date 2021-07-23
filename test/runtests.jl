@@ -45,6 +45,7 @@ using MixedLayerThermoclineDynamics, OffsetArrays, Test
         @test xdomain_length(grid2D, Lx)
         @test ydomain_length(grid2D, Ly)
     end
+
 end
 
 @time @testset "Field tests" begin
@@ -52,10 +53,11 @@ end
     include("test_fields.jl")
     nx, ny = 100, 120
     Lx, Ly = 1.0, 1.2
-    
+    hx, hy = 2, 3
+
     dx, dy = Lx/nx, Ly/ny
     
-    grid1D = Grid1D(Periodic(), nx, 0, Lx)
+    grid1D = Grid1D(Periodic(), nx, 0, Lx; hx = hx)
     grid2D = Grid2D(Periodic(), Periodic(), nx, ny, 0, Lx, 0, Ly)
     
     # 1D Fields
@@ -81,20 +83,52 @@ end
     ∂htest1D = Field(Face, zero(hdata), grid1D)
     ∂utest1D = Field(Centre, zero(udata), grid1D)
     
+    h1D_from_outer = Field1D(Centre, hdata[1:nx], grid1D)
+    u1D_from_outer = Field1D(Face, udata[1:nx], grid1D)
+    
+    @test h1D.grid == h1D_from_outer.grid
+    @test u1D.grid == u1D_from_outer.grid
+    @test h1D.data ≈ h1D_from_outer.data
+    @test u1D.data ≈ u1D_from_outer.data
+    
     @test typeof(h1D) <: Field1D{Centre}
     @test typeof(u1D) <: Field1D{Face}
+    @test typeof(h1D_from_outer) <: Field1D{Centre}
+    @test typeof(u1D_from_outer) <: Field1D{Face}
 
     @test h1D.grid == grid1D
     @test u1D.grid == grid1D
-
-    @test h1D.data == hdata
-    @test u1D.data == udata
 
     @test test_𝐼x(𝐼uactual1D, 𝐼utest1D, u1D)
     @test test_𝐼x(𝐼hactual1D, 𝐼htest1D, h1D)
 
     @test test_∂x(∂uactual1D, ∂utest1D, u1D)
     @test test_∂x(∂hactual1D, ∂htest1D, h1D)
+
+    hdata_with_halos = OffsetArray(zeros(nx + 2*hx), -hx)
+
+    for i in 1:nx
+        hdata_with_halos[i] = hdata[i]
+    end
+
+    for i in 1:hx
+        hdata_with_halos[nx+i] = hdata[i]
+        hdata_with_halos[-i+1] = hdata[nx-i+1]
+    end
+
+    udata_with_halos = OffsetArray(zeros(nx + 2*hx), -hx)
+
+    for i in 1:nx
+        udata_with_halos[i] = udata[i]
+    end
+
+    for i in 1:hx
+        udata_with_halos[nx+i] = udata[i]
+        udata_with_halos[-i+1] = udata[nx-i+1]
+    end
+    
+    @test h1D.data ≈ hdata_with_halos
+    @test u1D.data ≈ udata_with_halos
     
     # 2D Fields
     hdata = @. [sin(2π * grid2D.xC[i]/Lx) * cos(4π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]

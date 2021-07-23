@@ -20,7 +20,8 @@ export
   AbstractField,
   Field1D,
   Field2D,
-  Field
+  Field,
+  fill_halos!
 
 """ Abstract supertype for topology of grids. """
 abstract type AbstractTopology end
