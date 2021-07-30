@@ -25,7 +25,10 @@ end
 Construct a one-dimensional staggered `grid` on domain `x ∈ [x_start, x_end]` with topology
 `Tx`, with `nx` interior grid points, and `hx` halo points.
 """
-function Grid1D(Tx, nx, x_start, x_end; hx=0)
+function Grid1D(Tx, nx, x_start, x_end; hx=1)
+
+    if hx == 0; throw(error("Number of halo points in x cannot be zero")); end
+
     Lx = x_end - x_start
     
     dx = Lx/nx
@@ -76,7 +79,11 @@ end
 Construct a two-dimensional staggered `grid` on domain `(x, y) ∈ [x_start, x_end] x [y_start, y_end]`
 with topologies `{Tx, Ty}`, with `{nx, ny}` interior grid points, and `{hx, hy}` halo points.
 """
-function Grid2D(Tx, Ty, nx, ny, x_start, x_end, y_start, y_end; hx=0, hy=0)
+function Grid2D(Tx, Ty, nx, ny, x_start, x_end, y_start, y_end; hx=1, hy=1)
+
+    if hx == 0; throw(error("Number of halo points in x cannot be zero")); end
+    if hy == 0; throw(error("Number of halo points in y cannot be zero")); end
+
     Lx = x_end - x_start
     Ly = y_end - y_start
     
