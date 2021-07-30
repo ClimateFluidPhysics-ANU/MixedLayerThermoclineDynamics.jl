@@ -133,9 +133,10 @@ function 𝐼x!(output::Field1D{LX}, input::Field1D{LX, Grid1D{Periodic}}) where
 end
 
 """
-    𝐼x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
+    𝐼x!(output::Field2D{<:Any, <:Any}, input::Field2D{<:Any, <:Any, Grid2D{Periodic, Periodic}})
 
-Interpolates a 2D `input` field that lives on `Centre`s `Centre`s to `output` field that lives on `Face`s `Centre`s.
+Interpolates a 2D `input` field to the location where the `output` field lives for 2D grids
+with periodic boundary conditions.
 """
 function 𝐼x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
@@ -144,7 +145,7 @@ function 𝐼x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Gr
         output.data[1, j] = (input.data[1, j] + input.data[nx, j]) / 2
     end
 
-    for j in 1:ny, i in 2:nx
+    for j in 1:ny, i in 1:nx
         output.data[i, j] = 𝐼xᶠᶜ(i, j, input)
     end
 
@@ -153,11 +154,6 @@ function 𝐼x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Gr
     return nothing
 end
 
-"""
-    𝐼x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
-
-Interpolates a 2D `input` field that lives on `Face`s `Centre`s to `output` field that lives on `Centre`s `Centre`s.
-"""
 function 𝐼x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     
@@ -165,7 +161,7 @@ function 𝐼x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Gr
         output.data[nx, j] = (input.data[1, j] + input.data[nx, j]) / 2
     end
 
-    for j in 1:ny, i in 1:nx-1
+    for j in 1:ny, i in 1:nx
         output.data[i, j] = 𝐼xᶜᶜ(i, j, input)
     end
 
@@ -174,10 +170,19 @@ function 𝐼x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Gr
     return nothing
 end
 
-"""
-    𝐼y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
+function 𝐼x!(output::Field2D{LX, LY}, input::Field2D{LX, LY, Grid2D{Periodic, Periodic}}) where {LX<:AbstractLocation, LY<:AbstractLocation}
+    @. output.data = input.data
+    
+    fill_halos!(output)
 
-Interpolates a 2D `input` field that lives on `Centre`s `Centre`s to `output` field that lives on `Centre`s `Face`s.
+    return nothing
+end
+
+"""
+    𝐼y!(output::Field2D{<:Any, <:Any}, input::Field2D{<:Any, <:Any, Grid1D{Periodic, Periodic}})
+
+Interpolates a 2D `input` field to the location where the `output` field lives for 2D grids
+with periodic boundary conditions.
 """
 function 𝐼y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
@@ -186,7 +191,7 @@ function 𝐼y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Gr
         output.data[i, 1] = (input.data[i, 1] + input.data[i, ny]) / 2
     end
     
-    for j in 2:ny, i in 1:nx
+    for j in 1:ny, i in 1:nx
         output.data[i, j] = 𝐼yᶜᶠ(i, j, input)
     end
 
@@ -195,11 +200,6 @@ function 𝐼y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Gr
     return nothing
 end
 
-"""
-    𝐼y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
-
-Interpolates a 2D `input` field that lives on `Centre`s `Face`s to `output` field that lives on `Centre`s `Centre`s.
-"""
 function 𝐼y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
         
@@ -207,12 +207,20 @@ function 𝐼y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Gr
         output.data[i, ny] = (input.data[i, 1] + input.data[i, ny]) / 2
     end
     
-    for j in 1:ny-1, i in 1:nx
+    for j in 1:ny, i in 1:nx
         output.data[i, j] = 𝐼yᶜᶜ(i, j, input)
     end
 
     fill_halos!(output)
     
+    return nothing
+end
+
+function 𝐼y!(output::Field2D{LX, LY}, input::Field2D{LX, LY, Grid2D{Periodic, Periodic}}) where {LX<:AbstractLocation, LY<:AbstractLocation}
+    @. output.data = input.data
+    
+    fill_halos!(output)
+
     return nothing
 end
 
@@ -248,6 +256,14 @@ function ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
     return nothing
 end
 
+"""
+    ∂x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
+
+Compute the derivative of a 1D `input` field onto the location where the `output` field lives
+for 1D grids with periodic boundary conditions.
+
+Compute the derivative of a 1D field of `data` from centre to face in x-direction.
+"""
 function ∂x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
     nx, dx = input.grid.nx, input.grid.dx
     
@@ -260,6 +276,14 @@ function ∂x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
     return nothing
 end
 
+"""
+    ∂x!(output::Field1D{Centre}, input::Field1D{Centre, Grid1D{Periodic}})
+
+Compute the derivative of a 1D `input` field onto the location where the `output` field lives
+for 1D grids with periodic boundary conditions.
+
+Compute the derivative of a 1D field of `data` from centre to centre in x-direction.
+"""
 function ∂x!(output::Field1D{Centre}, input::Field1D{Centre, Grid1D{Periodic}})
     nx, dx = input.grid.nx, input.grid.dx
     
@@ -269,13 +293,21 @@ function ∂x!(output::Field1D{Centre}, input::Field1D{Centre, Grid1D{Periodic}}
     
     fill_halos!(output)
     
-    𝐼x!(output, output)
+    𝐼x!(output, input)
     
     fill_halos!(output)
     
     return nothing
 end
 
+"""
+    ∂x!(output::Field1D{Face}, input::Field1D{Face, Grid1D{Periodic}})
+
+Compute the derivative of a 1D `input` field onto the location where the `output` field lives
+for 1D grids with periodic boundary conditions.
+
+Compute the derivative of a 1D field of `data` from face to face in x-direction.
+"""
 function ∂x!(output::Field1D{Face}, input::Field1D{Face, Grid1D{Periodic}})
     nx, dx = input.grid.nx, input.grid.dx
     
@@ -285,7 +317,7 @@ function ∂x!(output::Field1D{Face}, input::Field1D{Face, Grid1D{Periodic}})
     
     fill_halos!(output)
     
-    𝐼x!(output, output)
+    𝐼x!(output, input)
     
     fill_halos!(output)
     
@@ -295,7 +327,10 @@ end
 """
     ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
 
-Interpolates a 2D field of `data` from face to centre grid in x-direction.
+Compute the derivative of a 2D `input` field onto the location where the `output` field lives
+for 2D grids with periodic boundary conditions.
+
+Compute the derivative of a 2D field of `data` from face to centre in x-direction.
 """
 function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
@@ -305,7 +340,7 @@ function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Gri
         output.data[nx, j] = (input.data[1, j] - input.data[nx, j]) / dx
     end
 
-    for j in 1:ny, i = 1:nx-1
+    for j in 1:ny, i = 1:nx
         output.data[i, j] = δxᶜᶜ(i, j, input) / dx
     end
 
@@ -315,9 +350,41 @@ function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Gri
 end
 
 """
+    ∂x!(output::Field2D{face, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
+
+Compute the derivative of a 2D `input` field onto the location where the `output` field lives
+for 2D grids with periodic boundary conditions.
+
+Compute the derivative of a 2D field of `data` from face to face in x-direction.
+"""
+function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
+    nx, ny = input.grid.nx, input.grid.ny
+    dx = input.grid.dx
+        
+    for j in 1:ny
+        output.data[nx, j] = (input.data[1, j] - input.data[nx, j]) / dx
+    end
+
+    for j in 1:ny, i = 1:nx
+        output.data[i, j] = δxᶜᶜ(i, j, input) / dx
+    end
+
+    fill_halos!(output)
+
+    𝐼x!(output, input)
+
+    fill_halos!(output)
+
+    return nothing
+end
+
+"""
     ∂x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
 
-Interpolates a 2D field of `data` from centre to face in x-direction.
+Compute the derivative of a 2D `input` field onto the location where the `output` field lives
+for 2D grids with periodic boundary conditions.
+
+Compute the derivative of a 2D field of `data` from centre to face in x-direction.
 """
 function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
@@ -327,7 +394,7 @@ function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Gri
         output.data[1, j] = (input.data[1, j] - input.data[nx, j]) / dx
     end
 
-    for j in 1:ny, i in 2:nx
+    for j in 1:ny, i in 1:nx
         output.data[i, j] = δxᶠᶜ(i, j, input)/dx
     end
     
@@ -337,9 +404,41 @@ function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Gri
 end
 
 """
+    ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
+
+Compute the derivative of a 2D `input` field onto the location where the `output` field lives
+for 2D grids with periodic boundary conditions.
+
+Compute the derivative of a 2D field of `data` from centre to centre in x-direction.
+"""
+function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
+    nx, ny = input.grid.nx, input.grid.ny
+    dx = input.grid.dx
+
+    for j in 1:ny
+        output.data[1, j] = (input.data[1, j] - input.data[nx, j]) / dx
+    end
+
+    for j in 1:ny, i in 1:nx
+        output.data[i, j] = δxᶠᶜ(i, j, input)/dx
+    end
+    
+    fill_halos!(output)
+
+    𝐼x!(output, input)
+
+    fill_halos!(output)
+
+    return nothing
+end
+
+"""
     ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
 
-Interpolates a 2D field of `data` from face to centre in y-direction.
+Compute the derivative of a 2D `input` field onto the location where the `output` field lives
+for 2D grids with periodic boundary conditions.
+
+Compute the derivative of a 2D field of `data` from face to centre in y-direction.
 """
 function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
@@ -349,7 +448,7 @@ function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Gri
         output.data[i, ny] = (input.data[i, 1] - input.data[i, ny]) / dy
     end
 
-    for j in 1:ny-1, i in 1:nx
+    for j in 1:ny, i in 1:nx
         output.data[i, j] = δyᶜᶜ(i, j, input) / dy
     end
 
@@ -359,9 +458,41 @@ function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Gri
 end
 
 """
+    ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
+
+Compute the derivative of a 2D `input` field onto the location where the `output` field lives
+for 2D grids with periodic boundary conditions.
+
+Compute the derivative of a 2D field of `data` from face to face in y-direction.
+"""
+function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
+    nx, ny = input.grid.nx, input.grid.ny
+    dy = input.grid.dy
+        
+    for i in 1:nx
+        output.data[i, ny] = (input.data[i, 1] - input.data[i, ny]) / dy
+    end
+
+    for j in 1:ny, i in 1:nx
+        output.data[i, j] = δyᶜᶜ(i, j, input) / dy
+    end
+
+    fill_halos!(output)
+
+    𝐼y!(output, input)
+
+    fill_halos!(output)
+    
+    return nothing
+end
+
+"""
     ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
 
-Interpolates a 2D field of `data` from centre to face in y-direction.
+Compute the derivative of a 2D `input` field onto the location where the `output` field lives
+for 2D grids with periodic boundary conditions.
+
+Compute the derivative of a 2D field of `data` from centre to face in y-direction.
 """
 function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
@@ -371,9 +502,38 @@ function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Gri
         output.data[i, 1] = (input.data[i, 1] - input.data[i, ny]) / dy
     end
 
-    for j in 2:ny, i in 1:nx
+    for j in 1:ny, i in 1:nx
         output.data[i, j] = δyᶜᶠ(i, j, input)/dy
     end
+
+    fill_halos!(output)
+    
+    return nothing
+end
+
+"""
+    ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
+
+Compute the derivative of a 2D `input` field onto the location where the `output` field lives
+for 2D grids with periodic boundary conditions.
+
+Compute the derivative of a 2D field of `data` from centre to centre in y-direction.
+"""
+function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
+    nx, ny = input.grid.nx, input.grid.ny
+    dy = input.grid.dy
+
+    for i in 1:nx
+        output.data[i, 1] = (input.data[i, 1] - input.data[i, ny]) / dy
+    end
+
+    for j in 1:ny, i in 1:nx
+        output.data[i, j] = δyᶜᶠ(i, j, input)/dy
+    end
+
+    fill_halos!(output)
+
+    𝐼y!(output, input)
 
     fill_halos!(output)
     
@@ -405,19 +565,15 @@ function fill_halos!(field::Field2D{<:Any, <:Any, Grid2D{Periodic, Periodic}})
     nx, hx = field.grid.nx, field.grid.hx
     ny, hy = field.grid.ny, field.grid.hy
 
-    for i in 1:hx
-        for j in 1:ny
-            field.data[nx+i, j] = field.data[i, j]
-            field.data[-i+1, j] = field.data[nx-i+1, j]
-        end
+    for j in 1:ny, i in 1:hx
+        field.data[nx+i, j] = field.data[i, j]
+        field.data[-i+1, j] = field.data[nx-i+1, j]
     end
 
-    for i in 1:nx
-        for j in 1:hy
-            field.data[i, ny+j] = field.data[i, j]
-            field.data[i, -j+1] = field.data[i, ny-j+1]
-        end
+    for j in 1:hy, i in 1:nx
+        field.data[i, ny+j] = field.data[i, j]
+        field.data[i, -j+1] = field.data[i, ny-j+1]
     end
-
+    
     return nothing
  end

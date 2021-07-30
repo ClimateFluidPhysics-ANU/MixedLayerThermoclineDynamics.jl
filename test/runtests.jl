@@ -113,8 +113,6 @@ end
     
     @test test_∂x(∂uactual1D, ∂utest1D, u1D)
     @test test_∂x(∂hactual1D, ∂htest1D, h1D)
-    @test test_∂x(∂uactual1D, ∂htest1D, u1D)
-    @test test_∂x(∂hactual1D, ∂utest1D, h1D)
 
     hdata_with_halos = OffsetArray(zeros(nx + 2*hx), -hx)
 
@@ -205,6 +203,11 @@ end
     @test test_𝐼y(𝐼hvactual2D, 𝐼hvtest2D, h2D)
     @test test_𝐼x(𝐼uactual2D, 𝐼utest2D, u2D)
     @test test_𝐼y(𝐼vactual2D, 𝐼vtest2D, v2D)
+
+    @test test_𝐼x(h2D, 𝐼utest2D, h2D)
+    @test test_𝐼y(h2D, 𝐼vtest2D, h2D)
+    @test test_𝐼x(u2D, 𝐼hutest2D, u2D)
+    @test test_𝐼y(v2D, 𝐼hvtest2D, v2D)
 
     @test test_∂x(∂huactual2D, ∂hutest2D, h2D)
     @test test_∂y(∂hvactual2D, ∂hvtest2D, h2D)
