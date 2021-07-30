@@ -46,11 +46,26 @@ $(TYPEDFIELDS)
 """
 struct Field2D{LX<:AbstractLocation, LY<:AbstractLocation, G} <: AbstractField
     "Array with the values of the field."
-    data :: Array
+    data :: OffsetArray
     "The grid on which the field lives."
     grid :: G
     
     Field2D(LX, LY, data, grid::G) where G = new{LX, LY, G}(data, grid)    
+end
+
+function Field2D(LX, LY, data::Array, grid::Grid2D)
+    nx, hx = grid.nx, grid.hx
+    ny, hy = grid.ny, grid.hy
+    
+    data_with_halos = OffsetArray(zeros(grid.nx + 2*grid.hx, grid.ny + 2*grid.hy), -grid.hx, -grid.hy)
+    
+    @. data_with_halos[1:nx, 1:ny] = data
+    
+    field = Field2D(LX, LY, data_with_halos, grid)
+
+    fill_halos!(field)
+
+    return field
 end
 
 """
@@ -132,6 +147,8 @@ function 𝐼x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Gr
     for j in 1:ny, i in 2:nx
         output.data[i, j] = 𝐼xᶠᶜ(i, j, input)
     end
+
+    fill_halos!(output)
     
     return nothing
 end
@@ -151,6 +168,8 @@ function 𝐼x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Gr
     for j in 1:ny, i in 1:nx-1
         output.data[i, j] = 𝐼xᶜᶜ(i, j, input)
     end
+
+    fill_halos!(output)
     
     return nothing
 end
@@ -170,6 +189,8 @@ function 𝐼y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Gr
     for j in 2:ny, i in 1:nx
         output.data[i, j] = 𝐼yᶜᶠ(i, j, input)
     end
+
+    fill_halos!(output)
     
     return nothing
 end
@@ -189,6 +210,8 @@ function 𝐼y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Gr
     for j in 1:ny-1, i in 1:nx
         output.data[i, j] = 𝐼yᶜᶜ(i, j, input)
     end
+
+    fill_halos!(output)
     
     return nothing
 end
@@ -285,6 +308,8 @@ function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Gri
     for j in 1:ny, i = 1:nx-1
         output.data[i, j] = δxᶜᶜ(i, j, input) / dx
     end
+
+    fill_halos!(output)
     
     return nothing
 end
@@ -306,6 +331,8 @@ function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Gri
         output.data[i, j] = δxᶠᶜ(i, j, input)/dx
     end
     
+    fill_halos!(output)
+
     return nothing
 end
 
@@ -325,6 +352,8 @@ function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Gri
     for j in 1:ny-1, i in 1:nx
         output.data[i, j] = δyᶜᶜ(i, j, input) / dy
     end
+
+    fill_halos!(output)
     
     return nothing
 end
@@ -345,6 +374,8 @@ function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Gri
     for j in 2:ny, i in 1:nx
         output.data[i, j] = δyᶜᶠ(i, j, input)/dy
     end
+
+    fill_halos!(output)
     
     return nothing
 end
@@ -355,11 +386,37 @@ end
 Fill halos for a 1D `field` that lives on a grid with periodic boundary conditions.
 """
 function fill_halos!(field::Field1D{<:Any, Grid1D{Periodic}})
-     nx, hx = field.grid.nx, field.grid.hx
+    nx, hx = field.grid.nx, field.grid.hx
 
-     for i in 1:hx
+    for i in 1:hx
         field.data[nx+i] = field.data[i]
         field.data[-i+1] = field.data[nx-i+1]
+    end
+
+    return nothing
+ end
+
+"""
+    fill_halos!(field::Field2D{<:Any, <:Any, Grid2D{Periodic, Periodic}})
+
+Fill halos for a 2D `field` that lives on a grid with periodic boundary conditions in both directions.
+"""
+function fill_halos!(field::Field2D{<:Any, <:Any, Grid2D{Periodic, Periodic}})
+    nx, hx = field.grid.nx, field.grid.hx
+    ny, hy = field.grid.ny, field.grid.hy
+
+    for i in 1:hx
+        for j in 1:ny
+            field.data[nx+i, j] = field.data[i, j]
+            field.data[-i+1, j] = field.data[nx-i+1, j]
+        end
+    end
+
+    for i in 1:nx
+        for j in 1:hy
+            field.data[i, ny+j] = field.data[i, j]
+            field.data[i, -j+1] = field.data[i, ny-j+1]
+        end
     end
 
     return nothing

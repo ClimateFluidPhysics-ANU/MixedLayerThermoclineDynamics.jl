@@ -61,7 +61,7 @@ end
     dx, dy = Lx/nx, Ly/ny
     
     grid1D = Grid1D(Periodic(), nx, 0, Lx; hx = hx)
-    grid2D = Grid2D(Periodic(), Periodic(), nx, ny, 0, Lx, 0, Ly)
+    grid2D = Grid2D(Periodic(), Periodic(), nx, ny, 0, Lx, 0, Ly; hx = hx, hy = hy)
     
     # 1D Fields
     hdata = @. sin(2π * grid1D.xC / Lx)
@@ -174,6 +174,10 @@ end
     ∂utest2D = Field(Centre, Centre, zero(∂udata), grid2D)
     ∂vtest2D = Field(Centre, Centre, zero(∂vdata), grid2D)
 
+    h2D_from_outer = Field2D(Centre, Centre, hdata[1:nx, 1:ny], grid2D)
+    u2D_from_outer = Field2D(Face, Centre, udata[1:nx, 1:ny], grid2D)
+    v2D_from_outer = Field2D(Centre, Face, vdata[1:nx, 1:ny], grid2D)
+
     @test typeof(h2D) <: Field2D{Centre, Centre}
     @test typeof(u2D) <: Field2D{Face, Centre}
     @test typeof(v2D) <: Field2D{Centre, Face}
@@ -182,9 +186,12 @@ end
     @test u2D.grid == grid2D
     @test v2D.grid == grid2D
 
-    @test h2D.data == hdata
-    @test u2D.data == udata
-    @test v2D.data == vdata
+    @test h2D.grid == h2D_from_outer.grid
+    @test u2D.grid == u2D_from_outer.grid
+    @test v2D.grid == v2D_from_outer.grid
+    @test h2D.data ≈ h2D_from_outer.data
+    @test u2D.data ≈ u2D_from_outer.data
+    @test v2D.data ≈ v2D_from_outer.data
     
     for field in [h1D, u1D, h2D, u2D, v2D]
         @test typeof(field) <: AbstractField
