@@ -27,7 +27,7 @@ Construct a one-dimensional staggered `grid` on domain `x ∈ [x_start, x_end]` 
 """
 function Grid1D(Tx, nx, x_start, x_end; hx=1)
 
-    if hx == 0; throw(error("Number of halo points cannot be zero")); end
+    if hx == 0; throw(error("Number of halo points in x cannot be zero")); end
 
     Lx = x_end - x_start
     

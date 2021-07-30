@@ -58,6 +58,10 @@ end
     Lx, Ly = 1.0, 1.2
     hx, hy = 2, 3
 
+    @test_throws ErrorException("Number of halo points in x cannot be zero") Grid1D(Periodic(), nx, 0, Lx; hx = 0)
+    @test_throws ErrorException("Number of halo points in x cannot be zero") Grid2D(Periodic(), Periodic(), nx, 0, Lx, ny, 0, Ly; hx = 0, hy = 1)
+    @test_throws ErrorException("Number of halo points in y cannot be zero") Grid2D(Periodic(), Periodic(), nx, 0, Lx, ny, 0, Ly; hx = 1, hy = 0)
+
     dx, dy = Lx/nx, Ly/ny
     
     grid1D = Grid1D(Periodic(), nx, 0, Lx; hx = hx)
