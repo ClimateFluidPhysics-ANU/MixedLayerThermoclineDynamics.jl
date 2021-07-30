@@ -57,7 +57,7 @@ function Field2D(LX, LY, data::Array, grid::Grid2D)
     nx, hx = grid.nx, grid.hx
     ny, hy = grid.ny, grid.hy
     
-    data_with_halos = OffsetArray(zeros(grid.nx + 2*grid.hx, grid.ny + 2*grid.hy), -grid.hx, -grid.hy)
+    data_with_halos = OffsetArray(zeros(nx + 2hx, ny + 2hy), -hx, -hy)
     
     @. data_with_halos[1:nx, 1:ny] = data
     
