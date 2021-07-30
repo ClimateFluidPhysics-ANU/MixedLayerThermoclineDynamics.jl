@@ -83,9 +83,8 @@ with topologies `{Tx, Ty}`, with `{nx, ny}` interior grid points, and `{hx, hy}`
 """
 function Grid2D(Tx, Ty, nx, ny, x_start, x_end, y_start, y_end; hx=1, hy=1)
 
-    if(hx == 0 || hy == 0)
-        throw(error("Number of halo points cannot be zero"))
-    end
+    if hx == 0; throw(error("Number of halo points in x cannot be zero")); end
+    if hy == 0; throw(error("Number of halo points in y cannot be zero")); end
 
     Lx = x_end - x_start
     Ly = y_end - y_start
