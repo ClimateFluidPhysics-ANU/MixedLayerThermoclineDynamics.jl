@@ -77,6 +77,9 @@ end
     ∂hdata = @.  (2π/Lx) * cos(2π * grid1D.xF / Lx)
     ∂udata = @. -(4π/Lx) * sin(4π * grid1D.xC / Lx)
 
+    ∂h_on_h_data = @.  (2π/Lx) * cos(2π * grid1D.xF / Lx)
+    ∂u_on_u_data = @. -(4π/Lx) * sin(4π * grid1D.xC / Lx)
+
     h1D = Field(Centre, hdata, grid1D)
     u1D = Field(Face, udata, grid1D)
 
@@ -87,6 +90,8 @@ end
 
     ∂hactual1D = Field(Face, ∂hdata, grid1D)
     ∂uactual1D = Field(Centre, ∂udata, grid1D)
+    ∂h_on_h_actual1D = Field(Centre, ∂h_on_h_data, grid1D)
+    ∂u_on_u_actual1D = Field(Face, ∂u_on_u_data, grid1D)
     ∂htest1D = Field(Face, zero(hdata), grid1D)
     ∂utest1D = Field(Centre, zero(udata), grid1D)
     
@@ -113,6 +118,8 @@ end
     
     @test test_∂x(∂uactual1D, ∂utest1D, u1D)
     @test test_∂x(∂hactual1D, ∂htest1D, h1D)
+    @test test_∂x(∂u_on_u_actual1D, ∂htest1D, u1D)
+    @test test_∂x(∂h_on_h_actual1D, ∂utest1D, h1D)
 
     hdata_with_halos = OffsetArray(zeros(nx + 2*hx), -hx)
 
@@ -154,6 +161,12 @@ end
     ∂udata = @. (-6π/Lx) * [sin(6π * grid2D.xC[i]/Lx) * cos(2π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
     ∂vdata = @. (6π/Ly) * [sin(8π * grid2D.xC[i]/Lx) * cos(6π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
 
+    ∂hx_on_h_data = @. (2π/Lx) * [cos(2π * grid2D.xC[i]/Lx) * cos(4π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
+    ∂hy_on_h_data = @. -(4π/Ly) * [sin(2π * grid2D.xC[i]/Lx) * sin(4π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
+    
+    ∂u_on_u_data = @. (-6π/Lx) * [sin(6π * grid2D.xF[i]/Lx) * cos(2π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
+    ∂v_on_v_data = @. (6π/Ly) * [sin(8π * grid2D.xC[i]/Lx) * cos(6π * grid2D.yF[j]/Ly) for i in 1:nx, j in 1:ny]
+
     h2D = Field(Centre, Center, hdata, grid2D)
     u2D = Field(Face, Center, udata, grid2D)
     v2D = Field(Centre, Face, vdata, grid2D)
@@ -175,6 +188,11 @@ end
     ∂hvtest2D = Field(Centre, Face, zero(∂hvdata), grid2D)
     ∂utest2D = Field(Centre, Centre, zero(∂udata), grid2D)
     ∂vtest2D = Field(Centre, Centre, zero(∂vdata), grid2D)
+
+    ∂hx_on_h_actual2D = Field(Centre, Centre, ∂hx_on_h_data, grid2D)
+    ∂hy_on_h_actual2D = Field(Centre, Centre, ∂hy_on_h_data, grid2D)
+    ∂u_on_u_actual2D = Field(Face, Centre, ∂u_on_u_data, grid2D)
+    ∂v_on_v_actual2D = Field(Centre, Face, ∂v_on_v_data, grid2D)
 
     h2D_from_outer = Field2D(Centre, Centre, hdata[1:nx, 1:ny], grid2D)
     u2D_from_outer = Field2D(Face, Centre, udata[1:nx, 1:ny], grid2D)
@@ -213,5 +231,10 @@ end
     @test test_∂y(∂hvactual2D, ∂hvtest2D, h2D)
     @test test_∂x(∂uactual2D, ∂utest2D, u2D)
     @test test_∂y(∂vactual2D, ∂vtest2D, v2D)
+
+    @test test_∂x(∂hx_on_h_actual2D, ∂utest2D, h2D)
+    @test test_∂y(∂hy_on_h_actual2D, ∂vtest2D, h2D)
+    @test test_∂x(∂u_on_u_actual2D, ∂hutest2D, u2D)
+    @test test_∂y(∂v_on_v_actual2D, ∂hvtest2D, v2D)
 
 end
