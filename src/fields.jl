@@ -229,12 +229,18 @@ end
 #####
 
 δxᶜ(i, f::Field1D{Face})   = f.data[i+1] - f.data[i]
+δxᶜ(i, f::Field1D{Centre}) = f.data[i+1] - f.data[i-1]
 δxᶠ(i, f::Field1D{Centre}) = f.data[i] - f.data[i-1]
+δxᶠ(i, f::Field1D{Face})   = f.data[i+1] - f.data[i-1]
 
 δxᶜᶜ(i, j, f::Field2D{Face, Centre})   = f.data[i+1, j] - f.data[i, j]
+δxᶜᶜ(i, j, f::Field2D{Centre, Centre}) = f.data[i+1, j] - f.data[i-1, j]
 δxᶠᶜ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j] - f.data[i-1, j]
+δxᶠᶜ(i, j, f::Field2D{Face, Centre})   = f.data[i+1, j] - f.data[i-1, j]
 δyᶜᶜ(i, j, f::Field2D{Centre, Face})   = f.data[i, j+1] - f.data[i, j]
+δyᶜᶜ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j+1] - f.data[i, j-1]
 δyᶜᶠ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j] - f.data[i, j-1]
+δyᶜᶠ(i, j, f::Field2D{Centre, Face})   = f.data[i, j+1] - f.data[i, j-1]
 
 """
     ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
@@ -358,12 +364,8 @@ function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Face, Centre, Grid2
     dx = input.grid.dx
 
     for j in 1:ny, i = 1:nx
-        output.data[i, j] = δxᶜᶜ(i, j, input) / dx
+        output.data[i, j] = δxᶠᶜ(i, j, input) / (2*dx)
     end
-
-    fill_halos!(output)
-
-    𝐼x!(output, output)
 
     fill_halos!(output)
 
@@ -404,12 +406,8 @@ function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, G
     dx = input.grid.dx
 
     for j in 1:ny, i in 1:nx
-        output.data[i, j] = δxᶠᶜ(i, j, input)/dx
+        output.data[i, j] = δxᶜᶜ(i, j, input) / (2*dx)
     end
-    
-    fill_halos!(output)
-
-    𝐼x!(output, output)
 
     fill_halos!(output)
 
@@ -450,12 +448,8 @@ function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Face, Grid2
     dy = input.grid.dy
 
     for j in 1:ny, i in 1:nx
-        output.data[i, j] = δyᶜᶜ(i, j, input) / dy
+        output.data[i, j] = δyᶜᶠ(i, j, input) / (2*dy)
     end
-
-    fill_halos!(output)
-
-    𝐼y!(output, output)
 
     fill_halos!(output)
     
@@ -475,7 +469,7 @@ function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Gri
     dy = input.grid.dy
 
     for j in 1:ny, i in 1:nx
-        output.data[i, j] = δyᶜᶠ(i, j, input)/dy
+        output.data[i, j] = δyᶜᶠ(i, j, input) / dy
     end
 
     fill_halos!(output)
@@ -496,12 +490,8 @@ function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, G
     dy = input.grid.dy
 
     for j in 1:ny, i in 1:nx
-        output.data[i, j] = δyᶜᶠ(i, j, input)/dy
+        output.data[i, j] = δyᶜᶜ(i, j, input) / (2*dy)
     end
-
-    fill_halos!(output)
-
-    𝐼y!(output, output)
 
     fill_halos!(output)
     
