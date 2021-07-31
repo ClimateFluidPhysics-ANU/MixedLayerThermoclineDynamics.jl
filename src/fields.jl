@@ -26,7 +26,7 @@ end
 function Field1D(LX, data::Array, grid::Grid1D)
     nx, hx = grid.nx, grid.hx
     
-    data_with_halos = OffsetArray(zeros(grid.nx + 2*grid.hx), -grid.hx)
+    data_with_halos = OffsetArray(zeros(nx + 2hx), -grid.hx)
     
     @. data_with_halos[1:nx] = data
     
@@ -95,7 +95,7 @@ Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
 𝐼yᶜᶠ(i, j, f::Field2D{Centre, Centre}) = (f.data[i, j-1] + f.data[i, j]) / 2
 
 """
-    𝐼x!(output::Field1D{<:Any}, input::Field1D{<:Any, Grid1D{Periodic}})
+    𝐼x!(output::Field1D, input::Field1D{<:Any, Grid1D{Periodic}})
 
 Interpolates a 1D `input` field to the location where the `output` field lives for 1D grids
 with periodic boundary conditions.
@@ -229,18 +229,12 @@ end
 #####
 
 δxᶜ(i, f::Field1D{Face})   = f.data[i+1] - f.data[i]
-δxᶜ(i, f::Field1D{Centre}) = f.data[i+1] - f.data[i-1]
 δxᶠ(i, f::Field1D{Centre}) = f.data[i] - f.data[i-1]
-δxᶠ(i, f::Field1D{Face})   = f.data[i+1] - f.data[i-1]
 
 δxᶜᶜ(i, j, f::Field2D{Face, Centre})   = f.data[i+1, j] - f.data[i, j]
-δxᶜᶜ(i, j, f::Field2D{Centre, Centre}) = f.data[i+1, j] - f.data[i-1, j]
 δxᶠᶜ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j] - f.data[i-1, j]
-δxᶠᶜ(i, j, f::Field2D{Face, Centre})   = f.data[i+1, j] - f.data[i-1, j]
 δyᶜᶜ(i, j, f::Field2D{Centre, Face})   = f.data[i, j+1] - f.data[i, j]
-δyᶜᶜ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j+1] - f.data[i, j-1]
 δyᶜᶠ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j] - f.data[i, j-1]
-δyᶜᶠ(i, j, f::Field2D{Centre, Face})   = f.data[i, j+1] - f.data[i, j-1]
 
 """
     ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
@@ -299,7 +293,7 @@ function ∂x!(output::Field1D{Centre}, input::Field1D{Centre, Grid1D{Periodic}}
     
     fill_halos!(output)
     
-    𝐼x!(output, output)
+    𝐼x!(output, input)
     
     fill_halos!(output)
     
@@ -323,7 +317,7 @@ function ∂x!(output::Field1D{Face}, input::Field1D{Face, Grid1D{Periodic}})
     
     fill_halos!(output)
     
-    𝐼x!(output, output)
+    𝐼x!(output, input)
     
     fill_halos!(output)
     
@@ -341,6 +335,10 @@ Compute the derivative of a 2D field of `data` from face to centre in x-directio
 function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dx = input.grid.dx
+        
+    for j in 1:ny
+        output.data[nx, j] = (input.data[1, j] - input.data[nx, j]) / dx
+    end
 
     for j in 1:ny, i = 1:nx
         output.data[i, j] = δxᶜᶜ(i, j, input) / dx
@@ -362,10 +360,18 @@ Compute the derivative of a 2D field of `data` from face to face in x-direction.
 function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dx = input.grid.dx
+        
+    for j in 1:ny
+        output.data[nx, j] = (input.data[1, j] - input.data[nx, j]) / dx
+    end
 
     for j in 1:ny, i = 1:nx
-        output.data[i, j] = δxᶠᶜ(i, j, input) / (2*dx)
+        output.data[i, j] = δxᶜᶜ(i, j, input) / dx
     end
+
+    fill_halos!(output)
+
+    𝐼x!(output, input)
 
     fill_halos!(output)
 
@@ -383,6 +389,10 @@ Compute the derivative of a 2D field of `data` from centre to face in x-directio
 function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dx = input.grid.dx
+
+    for j in 1:ny
+        output.data[1, j] = (input.data[1, j] - input.data[nx, j]) / dx
+    end
 
     for j in 1:ny, i in 1:nx
         output.data[i, j] = δxᶠᶜ(i, j, input)/dx
@@ -405,9 +415,17 @@ function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, G
     nx, ny = input.grid.nx, input.grid.ny
     dx = input.grid.dx
 
-    for j in 1:ny, i in 1:nx
-        output.data[i, j] = δxᶜᶜ(i, j, input) / (2*dx)
+    for j in 1:ny
+        output.data[1, j] = (input.data[1, j] - input.data[nx, j]) / dx
     end
+
+    for j in 1:ny, i in 1:nx
+        output.data[i, j] = δxᶠᶜ(i, j, input)/dx
+    end
+    
+    fill_halos!(output)
+
+    𝐼x!(output, input)
 
     fill_halos!(output)
 
@@ -425,6 +443,10 @@ Compute the derivative of a 2D field of `data` from face to centre in y-directio
 function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dy = input.grid.dy
+        
+    for i in 1:nx
+        output.data[i, ny] = (input.data[i, 1] - input.data[i, ny]) / dy
+    end
 
     for j in 1:ny, i in 1:nx
         output.data[i, j] = δyᶜᶜ(i, j, input) / dy
@@ -446,10 +468,18 @@ Compute the derivative of a 2D field of `data` from face to face in y-direction.
 function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dy = input.grid.dy
+        
+    for i in 1:nx
+        output.data[i, ny] = (input.data[i, 1] - input.data[i, ny]) / dy
+    end
 
     for j in 1:ny, i in 1:nx
-        output.data[i, j] = δyᶜᶠ(i, j, input) / (2*dy)
+        output.data[i, j] = δyᶜᶜ(i, j, input) / dy
     end
+
+    fill_halos!(output)
+
+    𝐼y!(output, input)
 
     fill_halos!(output)
     
@@ -468,8 +498,12 @@ function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Gri
     nx, ny = input.grid.nx, input.grid.ny
     dy = input.grid.dy
 
+    for i in 1:nx
+        output.data[i, 1] = (input.data[i, 1] - input.data[i, ny]) / dy
+    end
+
     for j in 1:ny, i in 1:nx
-        output.data[i, j] = δyᶜᶠ(i, j, input) / dy
+        output.data[i, j] = δyᶜᶠ(i, j, input)/dy
     end
 
     fill_halos!(output)
@@ -489,9 +523,17 @@ function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, G
     nx, ny = input.grid.nx, input.grid.ny
     dy = input.grid.dy
 
-    for j in 1:ny, i in 1:nx
-        output.data[i, j] = δyᶜᶜ(i, j, input) / (2*dy)
+    for i in 1:nx
+        output.data[i, 1] = (input.data[i, 1] - input.data[i, ny]) / dy
     end
+
+    for j in 1:ny, i in 1:nx
+        output.data[i, j] = δyᶜᶠ(i, j, input)/dy
+    end
+
+    fill_halos!(output)
+
+    𝐼y!(output, input)
 
     fill_halos!(output)
     
