@@ -293,7 +293,7 @@ function ∂x!(output::Field1D{Centre}, input::Field1D{Centre, Grid1D{Periodic}}
     
     fill_halos!(output)
     
-    𝐼x!(output, input)
+    𝐼x!(output, output)
     
     fill_halos!(output)
     
@@ -317,7 +317,7 @@ function ∂x!(output::Field1D{Face}, input::Field1D{Face, Grid1D{Periodic}})
     
     fill_halos!(output)
     
-    𝐼x!(output, input)
+    𝐼x!(output, output)
     
     fill_halos!(output)
     
@@ -335,10 +335,6 @@ Compute the derivative of a 2D field of `data` from face to centre in x-directio
 function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dx = input.grid.dx
-        
-    for j in 1:ny
-        output.data[nx, j] = (input.data[1, j] - input.data[nx, j]) / dx
-    end
 
     for j in 1:ny, i = 1:nx
         output.data[i, j] = δxᶜᶜ(i, j, input) / dx
@@ -360,10 +356,6 @@ Compute the derivative of a 2D field of `data` from face to face in x-direction.
 function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dx = input.grid.dx
-        
-    for j in 1:ny
-        output.data[nx, j] = (input.data[1, j] - input.data[nx, j]) / dx
-    end
 
     for j in 1:ny, i = 1:nx
         output.data[i, j] = δxᶜᶜ(i, j, input) / dx
@@ -371,7 +363,7 @@ function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Face, Centre, Grid2
 
     fill_halos!(output)
 
-    𝐼x!(output, input)
+    𝐼x!(output, output)
 
     fill_halos!(output)
 
@@ -389,10 +381,6 @@ Compute the derivative of a 2D field of `data` from centre to face in x-directio
 function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dx = input.grid.dx
-
-    for j in 1:ny
-        output.data[1, j] = (input.data[1, j] - input.data[nx, j]) / dx
-    end
 
     for j in 1:ny, i in 1:nx
         output.data[i, j] = δxᶠᶜ(i, j, input)/dx
@@ -415,17 +403,13 @@ function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, G
     nx, ny = input.grid.nx, input.grid.ny
     dx = input.grid.dx
 
-    for j in 1:ny
-        output.data[1, j] = (input.data[1, j] - input.data[nx, j]) / dx
-    end
-
     for j in 1:ny, i in 1:nx
         output.data[i, j] = δxᶠᶜ(i, j, input)/dx
     end
     
     fill_halos!(output)
 
-    𝐼x!(output, input)
+    𝐼x!(output, output)
 
     fill_halos!(output)
 
@@ -443,10 +427,6 @@ Compute the derivative of a 2D field of `data` from face to centre in y-directio
 function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dy = input.grid.dy
-        
-    for i in 1:nx
-        output.data[i, ny] = (input.data[i, 1] - input.data[i, ny]) / dy
-    end
 
     for j in 1:ny, i in 1:nx
         output.data[i, j] = δyᶜᶜ(i, j, input) / dy
@@ -468,10 +448,6 @@ Compute the derivative of a 2D field of `data` from face to face in y-direction.
 function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dy = input.grid.dy
-        
-    for i in 1:nx
-        output.data[i, ny] = (input.data[i, 1] - input.data[i, ny]) / dy
-    end
 
     for j in 1:ny, i in 1:nx
         output.data[i, j] = δyᶜᶜ(i, j, input) / dy
@@ -479,7 +455,7 @@ function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Face, Grid2
 
     fill_halos!(output)
 
-    𝐼y!(output, input)
+    𝐼y!(output, output)
 
     fill_halos!(output)
     
@@ -497,10 +473,6 @@ Compute the derivative of a 2D field of `data` from centre to face in y-directio
 function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dy = input.grid.dy
-
-    for i in 1:nx
-        output.data[i, 1] = (input.data[i, 1] - input.data[i, ny]) / dy
-    end
 
     for j in 1:ny, i in 1:nx
         output.data[i, j] = δyᶜᶠ(i, j, input)/dy
@@ -523,17 +495,13 @@ function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, G
     nx, ny = input.grid.nx, input.grid.ny
     dy = input.grid.dy
 
-    for i in 1:nx
-        output.data[i, 1] = (input.data[i, 1] - input.data[i, ny]) / dy
-    end
-
     for j in 1:ny, i in 1:nx
         output.data[i, j] = δyᶜᶠ(i, j, input)/dy
     end
 
     fill_halos!(output)
 
-    𝐼y!(output, input)
+    𝐼y!(output, output)
 
     fill_halos!(output)
     
