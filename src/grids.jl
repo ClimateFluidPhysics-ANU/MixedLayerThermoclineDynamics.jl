@@ -21,9 +21,25 @@ struct Grid1D{Tx<:AbstractTopology} <: AbstractGrid
 end
 
 """
-    Grid1D(Tx, nx, x_start, x_end; hx=0)
+    Grid1D(Tx, nx, x_start, x_end; hx=1)
+
 Construct a one-dimensional staggered `grid` on domain `x ∈ [x_start, x_end]` with topology
 `Tx`, with `nx` interior grid points, and `hx` halo points.
+
+Example
+=======
+
+```jldoctest
+julia> using MixedLayerThermoclineDynamics
+
+julia> grid = Grid1D(Periodic(), 10, 0, 2.0)
+1-Dimensional Grid
+  ├───────── topology: Periodic
+  ├─ domain extent Lx: 2.0
+  ├──── resolution nx: 10
+  ├── grid spacing dx: 0.2
+  └─── halo points nx: 1
+  ```
 """
 function Grid1D(Tx, nx, x_start, x_end; hx=1)
 
@@ -130,3 +146,11 @@ function construct_centres(T::AbstractTopology, n, h, d, L, start)
     
     return OffsetArray(C, -h)
 end
+
+show(io::IO, grid::Grid1D{Tx}) where Tx =
+     print(io, "1-Dimensional Grid\n",
+               "  ├───────── topology: ", Tx, '\n',
+               "  ├─ domain extent Lx: ", grid.Lx, '\n',
+               "  ├──── resolution nx: ", grid.nx, '\n',
+               "  ├── grid spacing dx: ", grid.dx, '\n',
+               "  └─── halo points nx: ", grid.hx)

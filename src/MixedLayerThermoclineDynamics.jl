@@ -25,6 +25,8 @@ export
   𝐼x!, 𝐼y!,
   ∂x!, ∂y!
 
+import Base: show
+
 """ Abstract supertype for topology of grids. """
 abstract type AbstractTopology end
 
