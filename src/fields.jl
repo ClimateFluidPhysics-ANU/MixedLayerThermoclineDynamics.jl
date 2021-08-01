@@ -140,10 +140,6 @@ with periodic boundary conditions.
 """
 function 𝐼x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
-    
-    for j in 1:ny
-        output.data[1, j] = (input.data[1, j] + input.data[nx, j]) / 2
-    end
 
     for j in 1:ny, i in 1:nx
         output.data[i, j] = 𝐼xᶠᶜ(i, j, input)
@@ -156,10 +152,6 @@ end
 
 function 𝐼x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
-    
-    for j in 1:ny
-        output.data[nx, j] = (input.data[1, j] + input.data[nx, j]) / 2
-    end
 
     for j in 1:ny, i in 1:nx
         output.data[i, j] = 𝐼xᶜᶜ(i, j, input)
@@ -186,10 +178,6 @@ with periodic boundary conditions.
 """
 function 𝐼y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
-        
-    for i in 1:nx
-        output.data[i, 1] = (input.data[i, 1] + input.data[i, ny]) / 2
-    end
     
     for j in 1:ny, i in 1:nx
         output.data[i, j] = 𝐼yᶜᶠ(i, j, input)
@@ -202,10 +190,6 @@ end
 
 function 𝐼y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
-        
-    for i in 1:nx
-        output.data[i, ny] = (input.data[i, 1] + input.data[i, ny]) / 2
-    end
     
     for j in 1:ny, i in 1:nx
         output.data[i, j] = 𝐼yᶜᶜ(i, j, input)
