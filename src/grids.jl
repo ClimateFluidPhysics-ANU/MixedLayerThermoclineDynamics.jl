@@ -39,7 +39,7 @@ julia> grid = Grid1D(Periodic(), 10, 0, 2.0)
   ├──── resolution nx: 10
   ├── grid spacing dx: 0.2
   └─── halo points nx: 1
-  ```
+```
 """
 function Grid1D(Tx, nx, x_start, x_end; hx=1)
 
