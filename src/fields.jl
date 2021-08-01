@@ -26,7 +26,7 @@ end
 function Field1D(LX, data::Array, grid::Grid1D)
     nx, hx = grid.nx, grid.hx
     
-    data_with_halos = OffsetArray(zeros(grid.nx + 2*grid.hx), -grid.hx)
+    data_with_halos = OffsetArray(zeros(nx + 2hx), -hx)
     
     @. data_with_halos[1:nx] = data
     
@@ -95,7 +95,7 @@ Field(LX, LY, data, grid::Grid2D) = Field2D(LX, LY, data, grid)
 𝐼yᶜᶠ(i, j, f::Field2D{Centre, Centre}) = (f.data[i, j-1] + f.data[i, j]) / 2
 
 """
-    𝐼x!(output::Field1D{<:Any}, input::Field1D{<:Any, Grid1D{Periodic}})
+    𝐼x!(output::Field1D, input::Field1D{<:Any, Grid1D{Periodic}})
 
 Interpolates a 1D `input` field to the location where the `output` field lives for 1D grids
 with periodic boundary conditions.
@@ -133,7 +133,7 @@ function 𝐼x!(output::Field1D{LX}, input::Field1D{LX, Grid1D{Periodic}}) where
 end
 
 """
-    𝐼x!(output::Field2D{<:Any, <:Any}, input::Field2D{<:Any, <:Any, Grid2D{Periodic, Periodic}})
+    𝐼x!(output::Field2D, input::Field2D{<:Any, <:Any, Grid2D{Periodic, Periodic}})
 
 Interpolates a 2D `input` field to the location where the `output` field lives for 2D grids
 with periodic boundary conditions.
@@ -171,7 +171,7 @@ function 𝐼x!(output::Field2D{LX, LY}, input::Field2D{LX, LY, Grid2D{Periodic,
 end
 
 """
-    𝐼y!(output::Field2D{<:Any, <:Any}, input::Field2D{<:Any, <:Any, Grid1D{Periodic, Periodic}})
+    𝐼y!(output::Field2D, input::Field2D{<:Any, <:Any, Grid1D{Periodic, Periodic}})
 
 Interpolates a 2D `input` field to the location where the `output` field lives for 2D grids
 with periodic boundary conditions.
@@ -214,16 +214,16 @@ end
 
 δxᶜ(i, f::Field1D{Face})   = f.data[i+1] - f.data[i]
 δxᶜ(i, f::Field1D{Centre}) = f.data[i+1] - f.data[i-1]
-δxᶠ(i, f::Field1D{Centre}) = f.data[i] - f.data[i-1]
+δxᶠ(i, f::Field1D{Centre}) = f.data[i]   - f.data[i-1]
 δxᶠ(i, f::Field1D{Face})   = f.data[i+1] - f.data[i-1]
 
 δxᶜᶜ(i, j, f::Field2D{Face, Centre})   = f.data[i+1, j] - f.data[i, j]
 δxᶜᶜ(i, j, f::Field2D{Centre, Centre}) = f.data[i+1, j] - f.data[i-1, j]
-δxᶠᶜ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j] - f.data[i-1, j]
+δxᶠᶜ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j]   - f.data[i-1, j]
 δxᶠᶜ(i, j, f::Field2D{Face, Centre})   = f.data[i+1, j] - f.data[i-1, j]
 δyᶜᶜ(i, j, f::Field2D{Centre, Face})   = f.data[i, j+1] - f.data[i, j]
 δyᶜᶜ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j+1] - f.data[i, j-1]
-δyᶜᶠ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j] - f.data[i, j-1]
+δyᶜᶠ(i, j, f::Field2D{Centre, Centre}) = f.data[i, j]   - f.data[i, j-1]
 δyᶜᶠ(i, j, f::Field2D{Centre, Face})   = f.data[i, j+1] - f.data[i, j-1]
 
 """
@@ -501,7 +501,8 @@ function fill_halos!(field::Field1D{<:Any, Grid1D{Periodic}})
 """
     fill_halos!(field::Field2D{<:Any, <:Any, Grid2D{Periodic, Periodic}})
 
-Fill halos for a 2D `field` that lives on a grid with periodic boundary conditions in both directions.
+Fill halos for a 2D `field` that lives on a grid with periodic boundary conditions in both
+directions.
 """
 function fill_halos!(field::Field2D{<:Any, <:Any, Grid2D{Periodic, Periodic}})
     nx, hx = field.grid.nx, field.grid.hx
