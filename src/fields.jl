@@ -278,12 +278,8 @@ function ∂x!(output::Field1D{Centre}, input::Field1D{Centre, Grid1D{Periodic}}
     nx, dx = input.grid.nx, input.grid.dx
     
     for i in 1:nx
-        output.data[i] = δxᶠ(i, input) / dx
+        output.data[i] = δxᶜ(i, input) / (2*dx)
     end
-    
-    fill_halos!(output)
-    
-    𝐼x!(output, output)
     
     fill_halos!(output)
     
@@ -302,12 +298,8 @@ function ∂x!(output::Field1D{Face}, input::Field1D{Face, Grid1D{Periodic}})
     nx, dx = input.grid.nx, input.grid.dx
     
     for i in 1:nx
-        output.data[i] = δxᶜ(i, input) / dx
+        output.data[i] = δxᶠ(i, input) / (2*dx)
     end
-    
-    fill_halos!(output)
-    
-    𝐼x!(output, output)
     
     fill_halos!(output)
     
