@@ -8,19 +8,19 @@ Center = Centre
 struct Face <: AbstractLocation end 
 
 """
-    struct Field1D{LX<:AbstractLocation, G} <: AbstractField
+    struct Field1D{LX<:AbstractLocation, G, D} <: AbstractField
 
-A field datatype for 1D objects.
+A field datatype for 1D objects containing data of type `D`.
 
 $(TYPEDFIELDS)
 """
-struct Field1D{LX<:AbstractLocation, G} <: AbstractField
+struct Field1D{LX<:AbstractLocation, G, D} <: AbstractField
     "Array with the values of the field."
-    data :: OffsetArray
+    data :: D
     "The grid on which the field lives."
     grid :: G
     
-    Field1D(LX, data, grid::G) where G = new{LX, G}(data, grid)
+    Field1D(LX, data::D, grid::G) where {G, D} = new{LX, G, D}(data, grid)
 end
 
 function Field1D(LX, data::Array, grid::Grid1D)
@@ -38,19 +38,19 @@ function Field1D(LX, data::Array, grid::Grid1D)
 end
 
 """
-    struct Field2D{LX<:AbstractLocation, LY<:AbstractLocation, G} <: AbstractField
+    struct Field2D{LX<:AbstractLocation, LY<:AbstractLocation, G, D} <: AbstractField
 
-A field datatype for 2D objects.
+A field datatype for 2D objects containing data of type `D`.
 
 $(TYPEDFIELDS)
 """
-struct Field2D{LX<:AbstractLocation, LY<:AbstractLocation, G} <: AbstractField
+struct Field2D{LX<:AbstractLocation, LY<:AbstractLocation, G, D} <: AbstractField
     "Array with the values of the field."
-    data :: Array
+    data :: D
     "The grid on which the field lives."
     grid :: G
     
-    Field2D(LX, LY, data, grid::G) where G = new{LX, LY, G}(data, grid)    
+    Field2D(LX, LY, data::D, grid::G) where {G, D} = new{LX, LY, G, D}(data, grid)    
 end
 
 """
