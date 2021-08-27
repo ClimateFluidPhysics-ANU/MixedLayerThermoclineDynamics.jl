@@ -90,10 +90,30 @@ struct Grid2D{Tx<:AbstractTopology, Ty<:AbstractTopology} <: AbstractGrid
 end
 
 """
-    Grid2D(Tx, Ty, nx, ny, x_start, x_end, y_start, y_end; hx=0, hy=0)
+    Grid2D(Tx, Ty, nx, ny, x_start, x_end, y_start, y_end; hx=1, hy=1)
 
 Construct a two-dimensional staggered `grid` on domain `(x, y) ∈ [x_start, x_end] x [y_start, y_end]`
 with topologies `{Tx, Ty}`, with `{nx, ny}` interior grid points, and `{hx, hy}` halo points.
+
+Example
+=======
+
+```jldoctest
+julia> using MixedLayerThermoclineDynamics
+
+julia> grid = Grid2D(Periodic(), Periodic(), 10, 15, 0, 2.0, 0, 3.0)
+1-Dimensional Grid
+  ├──── topology in x: Periodic
+  ├─ domain extent Lx: 2.0
+  ├──── resolution nx: 10
+  ├── grid spacing dx: 0.2
+  ├─── halo points nx: 1
+  ├──── topology in y: Periodic
+  ├─ domain extent Ly: 3.0
+  ├──── resolution ny: 15
+  ├── grid spacing dy: 0.2
+  └─── halo points ny: 1
+```
 """
 function Grid2D(Tx, Ty, nx, ny, x_start, x_end, y_start, y_end; hx=1, hy=1)
 
@@ -154,3 +174,16 @@ show(io::IO, grid::Grid1D{Tx}) where Tx =
                "  ├──── resolution nx: ", grid.nx, '\n',
                "  ├── grid spacing dx: ", grid.dx, '\n',
                "  └─── halo points nx: ", grid.hx)
+
+show(io::IO, grid::Grid2D{Tx, Ty}) where {Tx, Ty} =
+     print(io, "2-Dimensional Grid\n",
+               "  ├─────topology in x: ", Tx, '\n',
+               "  ├─ domain extent Lx: ", grid.Lx, '\n',
+               "  ├──── resolution nx: ", grid.nx, '\n',
+               "  ├── grid spacing dx: ", grid.dx, '\n',
+               "  ├─── halo points nx: ", grid.hx, '\n',
+               "  ├─────topology in y: ", Ty, '\n',
+               "  ├─ domain extent Ly: ", grid.Ly, '\n',
+               "  ├──── resolution ny: ", grid.ny, '\n',
+               "  ├── grid spacing dy: ", grid.dy, '\n',
+               "  └─── halo points ny: ", grid.hy)
