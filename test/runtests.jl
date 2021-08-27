@@ -77,8 +77,8 @@ end
     ∂hdata = @.  (2π/Lx) * cos(2π * grid1D.xF / Lx)
     ∂udata = @. -(4π/Lx) * sin(4π * grid1D.xC / Lx)
 
-    ∂h_on_h_data = @.  (2π/Lx) * cos(2π * grid1D.xF / Lx)
-    ∂u_on_u_data = @. -(4π/Lx) * sin(4π * grid1D.xC / Lx)
+    ∂h_on_h_data = @.  (2π/Lx) * cos(2π * grid1D.xC / Lx)
+    ∂u_on_u_data = @. -(4π/Lx) * sin(4π * grid1D.xF / Lx)
 
     h1D = Field(Centre, hdata, grid1D)
     u1D = Field(Face, udata, grid1D)
