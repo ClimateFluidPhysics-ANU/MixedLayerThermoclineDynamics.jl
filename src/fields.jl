@@ -124,14 +124,6 @@ function 𝐼x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
     return nothing
 end
 
-function 𝐼x!(output::Field1D{LX}, input::Field1D{LX, Grid1D{Periodic}}) where LX
-    @. output.data = input.data
-    
-    fill_halos!(output)
-
-    return nothing
-end
-
 """
     𝐼x!(output::Field2D, input::Field2D{<:Any, <:Any, Grid2D{Periodic, Periodic}})
 
@@ -162,14 +154,6 @@ function 𝐼x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Gr
     return nothing
 end
 
-function 𝐼x!(output::Field2D{LX, LY}, input::Field2D{LX, LY, Grid2D{Periodic, Periodic}}) where {LX<:AbstractLocation, LY<:AbstractLocation}
-    @. output.data = input.data
-    
-    fill_halos!(output)
-
-    return nothing
-end
-
 """
     𝐼y!(output::Field2D, input::Field2D{<:Any, <:Any, Grid1D{Periodic, Periodic}})
 
@@ -197,14 +181,6 @@ function 𝐼y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Gr
 
     fill_halos!(output)
     
-    return nothing
-end
-
-function 𝐼y!(output::Field2D{LX, LY}, input::Field2D{LX, LY, Grid2D{Periodic, Periodic}}) where {LX<:AbstractLocation, LY<:AbstractLocation}
-    @. output.data = input.data
-    
-    fill_halos!(output)
-
     return nothing
 end
 
