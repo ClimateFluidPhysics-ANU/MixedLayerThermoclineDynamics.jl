@@ -257,12 +257,10 @@ function ∂x!(output::Field1D{Face}, input::Field1D{Face, Grid1D{Periodic}})
 end
 
 """
-    ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
+    ∂x!(output::Field2D, input::Field2D{<:Any, <:Any, Grid2D{Periodic, Periodic}})
 
-Compute the derivative of a 2D `input` field onto the location where the `output` field lives
+Compute the ``x`` derivative of a 2D `input` field onto the location where the `output` field lives
 for 2D grids with periodic boundary conditions.
-
-Compute the derivative of a 2D field of `data` from face to centre in x-direction.
 """
 function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
@@ -277,14 +275,6 @@ function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Gri
     return nothing
 end
 
-"""
-    ∂x!(output::Field2D{face, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
-
-Compute the derivative of a 2D `input` field onto the location where the `output` field lives
-for 2D grids with periodic boundary conditions.
-
-Compute the derivative of a 2D field of `data` from face to face in x-direction.
-"""
 function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dx = input.grid.dx
@@ -298,14 +288,6 @@ function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Face, Centre, Grid2
     return nothing
 end
 
-"""
-    ∂x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
-
-Compute the derivative of a 2D `input` field onto the location where the `output` field lives
-for 2D grids with periodic boundary conditions.
-
-Compute the derivative of a 2D field of `data` from centre to face in x-direction.
-"""
 function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dx = input.grid.dx
@@ -319,14 +301,6 @@ function ∂x!(output::Field2D{Face, Centre}, input::Field2D{Centre, Centre, Gri
     return nothing
 end
 
-"""
-    ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Face, Centre, Grid2D{Periodic, Periodic}})
-
-Compute the derivative of a 2D `input` field onto the location where the `output` field lives
-for 2D grids with periodic boundary conditions.
-
-Compute the derivative of a 2D field of `data` from centre to centre in x-direction.
-"""
 function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dx = input.grid.dx
@@ -341,12 +315,10 @@ function ∂x!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, G
 end
 
 """
-    ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
+    ∂y!(output::Field2D, input::Field2D{<:Any, <:Any, Grid2D{Periodic, Periodic}})
 
-Compute the derivative of a 2D `input` field onto the location where the `output` field lives
+Compute the ``y`` derivative of a 2D `input` field onto the location where the `output` field lives
 for 2D grids with periodic boundary conditions.
-
-Compute the derivative of a 2D field of `data` from face to centre in y-direction.
 """
 function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
@@ -361,14 +333,6 @@ function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Face, Gri
     return nothing
 end
 
-"""
-    ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
-
-Compute the derivative of a 2D `input` field onto the location where the `output` field lives
-for 2D grids with periodic boundary conditions.
-
-Compute the derivative of a 2D field of `data` from face to face in y-direction.
-"""
 function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Face, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dy = input.grid.dy
@@ -382,14 +346,6 @@ function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Face, Grid2
     return nothing
 end
 
-"""
-    ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
-
-Compute the derivative of a 2D `input` field onto the location where the `output` field lives
-for 2D grids with periodic boundary conditions.
-
-Compute the derivative of a 2D field of `data` from centre to face in y-direction.
-"""
 function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dy = input.grid.dy
@@ -403,14 +359,6 @@ function ∂y!(output::Field2D{Centre, Face}, input::Field2D{Centre, Centre, Gri
     return nothing
 end
 
-"""
-    ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
-
-Compute the derivative of a 2D `input` field onto the location where the `output` field lives
-for 2D grids with periodic boundary conditions.
-
-Compute the derivative of a 2D field of `data` from centre to centre in y-direction.
-"""
 function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, Grid2D{Periodic, Periodic}})
     nx, ny = input.grid.nx, input.grid.ny
     dy = input.grid.dy
@@ -423,6 +371,10 @@ function ∂y!(output::Field2D{Centre, Centre}, input::Field2D{Centre, Centre, G
     
     return nothing
 end
+
+#####
+##### Filling halos
+#####
 
 """
     fill_halos!(field::Field1D{<:Any, Grid1D{Periodic}})
