@@ -1,11 +1,3 @@
-function test_dx(grid, dx)
-    return grid.dx == dx
-end
-
-function test_dy(grid::Grid2D, dy)
-    return grid.dy == dy
-end
-
 function test_xF(grid, xF)
     return grid.xF == xF
 end
