@@ -203,12 +203,10 @@ end
 δyᶜᶠ(i, j, f::Field2D{Centre, Face})   = f.data[i, j+1] - f.data[i, j-1]
 
 """
-    ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
+    ∂x!(output::Field1D, input::Field1D{<:Any, Grid1D{Periodic}})
 
 Compute the derivative of a 1D `input` field onto the location where the `output` field lives
 for 1D grids with periodic boundary conditions.
-
-Compute the derivative of a 1D field of `data` from face to centre in x-direction.
 """
 function ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
     nx, dx = input.grid.nx, input.grid.dx
@@ -222,14 +220,6 @@ function ∂x!(output::Field1D{Centre}, input::Field1D{Face, Grid1D{Periodic}})
     return nothing
 end
 
-"""
-    ∂x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
-
-Compute the derivative of a 1D `input` field onto the location where the `output` field lives
-for 1D grids with periodic boundary conditions.
-
-Compute the derivative of a 1D field of `data` from centre to face in x-direction.
-"""
 function ∂x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
     nx, dx = input.grid.nx, input.grid.dx
     
@@ -242,14 +232,6 @@ function ∂x!(output::Field1D{Face}, input::Field1D{Centre, Grid1D{Periodic}})
     return nothing
 end
 
-"""
-    ∂x!(output::Field1D{Centre}, input::Field1D{Centre, Grid1D{Periodic}})
-
-Compute the derivative of a 1D `input` field onto the location where the `output` field lives
-for 1D grids with periodic boundary conditions.
-
-Compute the derivative of a 1D field of `data` from centre to centre in x-direction.
-"""
 function ∂x!(output::Field1D{Centre}, input::Field1D{Centre, Grid1D{Periodic}})
     nx, dx = input.grid.nx, input.grid.dx
     
@@ -262,14 +244,6 @@ function ∂x!(output::Field1D{Centre}, input::Field1D{Centre, Grid1D{Periodic}}
     return nothing
 end
 
-"""
-    ∂x!(output::Field1D{Face}, input::Field1D{Face, Grid1D{Periodic}})
-
-Compute the derivative of a 1D `input` field onto the location where the `output` field lives
-for 1D grids with periodic boundary conditions.
-
-Compute the derivative of a 1D field of `data` from face to face in x-direction.
-"""
 function ∂x!(output::Field1D{Face}, input::Field1D{Face, Grid1D{Periodic}})
     nx, dx = input.grid.nx, input.grid.dx
     
