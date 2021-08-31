@@ -1,5 +1,3 @@
-using MixedLayerThermoclineDynamics
-
 function test_𝐼x(actual::Field1D, test::Field1D, input::Field1D)
     𝐼x!(test, input)
     return isapprox(test.data, actual.data; rtol = rtol_interpolation)

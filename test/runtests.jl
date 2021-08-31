@@ -1,7 +1,7 @@
 using MixedLayerThermoclineDynamics, OffsetArrays, Test
 
-const rtol_interpolation = 1e-2
-const rtol_derivatives = 1e-2
+const rtol_interpolation = 1e-3
+const rtol_derivatives = 1e-3
 
 @time @testset "Grid tests" begin
     include("test_grids.jl")
@@ -34,13 +34,13 @@ const rtol_derivatives = 1e-2
         yF = OffsetArray(yF, -hy)
         yC = OffsetArray(yC, -hy)
         
-        @test test_dx(grid1D, dx)
+        @test grid1D.dx == dx
         @test test_xF(grid1D, xF)
         @test test_xC(grid1D, xC)
         @test xdomain_length(grid1D, Lx)
 
-        @test test_dx(grid2D, dx)
-        @test test_dy(grid2D, dy)
+        @test grid2D.dx == dx
+        @test grid2D.dy == dy
         @test test_xF(grid2D, xF)
         @test test_xC(grid2D, xC)
         @test test_yF(grid2D, yF)
@@ -54,6 +54,7 @@ end
 @time @testset "Field tests" begin
 
     include("test_fields.jl")
+    
     nx, ny = 100, 120
     Lx, Ly = 1.0, 1.2
     hx, hy = 2, 3
@@ -62,90 +63,89 @@ end
     @test_throws ErrorException("Number of halo points in x cannot be zero") Grid2D(Periodic(), Periodic(), nx, 0, Lx, ny, 0, Ly; hx = 0, hy = 1)
     @test_throws ErrorException("Number of halo points in y cannot be zero") Grid2D(Periodic(), Periodic(), nx, 0, Lx, ny, 0, Ly; hx = 1, hy = 0)
 
-    dx, dy = Lx/nx, Ly/ny
+    dx, dy = Lx/nx, Ly/ny # note: this is only correct for Periodic
     
     grid1D = Grid1D(Periodic(), nx, 0, Lx; hx = hx)
     grid2D = Grid2D(Periodic(), Periodic(), nx, ny, 0, Lx, 0, Ly; hx = hx, hy = hy)
     
     # 1D Fields
-    hdata = @. sin(2π * grid1D.xC / Lx)
-    udata = @. cos(4π * grid1D.xF / Lx)
+    Cdata = @. sin(2π * grid1D.xC / Lx)
+    Fdata = @. cos(2π * grid1D.xF / Lx)
     
-    𝐼hdata = @. sin(2π * grid1D.xF / Lx)
-    𝐼udata = @. cos(4π * grid1D.xC / Lx)
+    Cdata_on_F = @. sin(2π * grid1D.xF / Lx)
+    Fdata_on_C = @. cos(2π * grid1D.xC / Lx)
 
-    ∂hdata = @.  (2π/Lx) * cos(2π * grid1D.xF / Lx)
-    ∂udata = @. -(4π/Lx) * sin(4π * grid1D.xC / Lx)
+    ∂x_Cdata = @.   2π/Lx * cos(2π * grid1D.xF / Lx)
+    ∂x_Fdata = @. - 2π/Lx * sin(2π * grid1D.xC / Lx)
 
-    ∂h_on_h_data = @.  (2π/Lx) * cos(2π * grid1D.xC / Lx)
-    ∂u_on_u_data = @. -(4π/Lx) * sin(4π * grid1D.xF / Lx)
+    ∂x_Cdata_on_C = @.   2π/Lx * cos(2π * grid1D.xC / Lx)
+    ∂x_Fdata_on_F = @. - 2π/Lx * sin(2π * grid1D.xF / Lx)
 
-    h1D = Field(Centre, hdata, grid1D)
-    u1D = Field(Face, udata, grid1D)
+    C_Field1D = Field(Centre, Cdata, grid1D)
+    F_Field1D = Field(Face, Fdata, grid1D)
 
-    𝐼hactual1D = Field(Face, 𝐼hdata, grid1D)
-    𝐼uactual1D = Field(Centre, 𝐼udata, grid1D)
-    𝐼htest1D = Field(Face, zero(hdata), grid1D)
-    𝐼utest1D = Field(Centre, zero(udata), grid1D)
+    Cdata_on_F_Field1D = Field(Face, Cdata_on_F, grid1D)
+    Fdata_on_C_Field1D = Field(Centre, Fdata_on_C, grid1D)
+    Ftest_Field1D = Field(Face, zero(Cdata), grid1D)
+    Ctest_Field1D = Field(Centre, zero(Fdata), grid1D)
 
-    ∂hactual1D = Field(Face, ∂hdata, grid1D)
-    ∂uactual1D = Field(Centre, ∂udata, grid1D)
-    ∂h_on_h_actual1D = Field(Centre, ∂h_on_h_data, grid1D)
-    ∂u_on_u_actual1D = Field(Face, ∂u_on_u_data, grid1D)
-    ∂htest1D = Field(Face, zero(hdata), grid1D)
-    ∂utest1D = Field(Centre, zero(udata), grid1D)
+    ∂x_Cdata_Field1D = Field(Face, ∂x_Cdata, grid1D)
+    ∂x_Fdata_Field1D = Field(Centre, ∂x_Fdata, grid1D)
+    ∂x_Cdata_on_C_Field1D = Field(Centre, ∂x_Cdata_on_C, grid1D)
+    ∂x_Fdata_on_F_Field1D = Field(Face, ∂x_Fdata_on_F, grid1D)
     
-    h1D_from_outer = Field1D(Centre, hdata[1:nx], grid1D)
-    u1D_from_outer = Field1D(Face, udata[1:nx], grid1D)
+    C_Field1D_from_array = Field1D(Centre, Cdata[1:nx], grid1D)
+    F_Field1D_from_array = Field1D(Face, Fdata[1:nx], grid1D)
     
-    @test h1D.grid == h1D_from_outer.grid
-    @test u1D.grid == u1D_from_outer.grid
-    @test h1D.data ≈ h1D_from_outer.data
-    @test u1D.data ≈ u1D_from_outer.data
+    @test C_Field1D.grid == C_Field1D_from_array.grid
+    @test F_Field1D.grid == F_Field1D_from_array.grid
+    @test C_Field1D.data ≈ C_Field1D_from_array.data
+    @test F_Field1D.data ≈ F_Field1D_from_array.data
     
-    @test typeof(h1D) <: Field1D{Centre}
-    @test typeof(u1D) <: Field1D{Face}
-    @test typeof(h1D_from_outer) <: Field1D{Centre}
-    @test typeof(u1D_from_outer) <: Field1D{Face}
+    @test typeof(C_Field1D) <: Field1D{Centre}
+    @test typeof(F_Field1D) <: Field1D{Face}
+    @test typeof(C_Field1D_from_array) <: Field1D{Centre}
+    @test typeof(F_Field1D_from_array) <: Field1D{Face}
 
-    @test h1D.grid == grid1D
-    @test u1D.grid == grid1D
+    @test C_Field1D.grid == grid1D
+    @test F_Field1D.grid == grid1D
 
-    @test test_𝐼x(𝐼uactual1D, 𝐼utest1D, u1D)
-    @test test_𝐼x(𝐼hactual1D, 𝐼htest1D, h1D)    
+    @test test_𝐼x(Fdata_on_C_Field1D, Ctest_Field1D, F_Field1D)
+    @test test_𝐼x(Cdata_on_F_Field1D, Ftest_Field1D, C_Field1D)    
     
-    @test test_∂x(∂uactual1D, ∂utest1D, u1D)
-    @test test_∂x(∂hactual1D, ∂htest1D, h1D)
-    @test test_∂x(∂u_on_u_actual1D, ∂htest1D, u1D)
-    @test test_∂x(∂h_on_h_actual1D, ∂utest1D, h1D)
+    @test test_∂x(∂x_Fdata_Field1D, Ctest_Field1D, F_Field1D)
+    @test test_∂x(∂x_Cdata_Field1D, Ftest_Field1D, C_Field1D)
+    @test test_∂x(∂x_Fdata_on_F_Field1D, Ftest_Field1D, F_Field1D)
+    @test test_∂x(∂x_Cdata_on_C_Field1D, Ctest_Field1D, C_Field1D)
 
-    hdata_with_halos = OffsetArray(zeros(nx + 2*hx), -hx)
+    Cdata_with_halos = OffsetArray(zeros(nx + 2hx), -hx)
 
     for i in 1:nx
-        hdata_with_halos[i] = hdata[i]
+        Cdata_with_halos[i] = Cdata[i]
     end
 
     for i in 1:hx
-        hdata_with_halos[nx+i] = hdata[i]
-        hdata_with_halos[-i+1] = hdata[nx-i+1]
+        Cdata_with_halos[nx+i] = Cdata[i]
+        Cdata_with_halos[-i+1] = Cdata[nx-i+1]
     end
 
-    udata_with_halos = OffsetArray(zeros(nx + 2*hx), -hx)
+    Fdata_with_halos = OffsetArray(zeros(nx + 2hx), -hx)
 
     for i in 1:nx
-        udata_with_halos[i] = udata[i]
+        Fdata_with_halos[i] = Fdata[i]
     end
 
     for i in 1:hx
-        udata_with_halos[nx+i] = udata[i]
-        udata_with_halos[-i+1] = udata[nx-i+1]
+        Fdata_with_halos[nx+i] = Fdata[i]
+        Fdata_with_halos[-i+1] = Fdata[nx-i+1]
     end
     
-    @test h1D.data ≈ hdata_with_halos
-    @test u1D.data ≈ udata_with_halos
+    @test C_Field1D.data ≈ Cdata_with_halos
+    @test F_Field1D.data ≈ Fdata_with_halos
     
+    #=
     # 2D Fields
-    hdata = @. [sin(2π * grid2D.xC[i]/Lx) * cos(4π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
+    Cdata = @. [sin(2π * grid2D.xC[i]/Lx) * cos(4π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
     udata = @. [cos(6π * grid2D.xF[i]/Lx) * cos(2π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
     vdata = @. [sin(8π * grid2D.xC[i]/Lx) * sin(6π * grid2D.yF[j]/Ly) for i in 1:nx, j in 1:ny]
 
@@ -165,7 +165,7 @@ end
     ∂u_on_u_data = @. (-6π/Lx) * [sin(6π * grid2D.xF[i]/Lx) * cos(2π * grid2D.yC[j]/Ly) for i in 1:nx, j in 1:ny]
     ∂v_on_v_data = @. (6π/Ly) * [sin(8π * grid2D.xC[i]/Lx) * cos(6π * grid2D.yF[j]/Ly) for i in 1:nx, j in 1:ny]
 
-    h2D = Field(Centre, Center, hdata, grid2D)
+    h2D = Field(Centre, Center, Cdata, grid2D)
     u2D = Field(Face, Center, udata, grid2D)
     v2D = Field(Centre, Face, vdata, grid2D)
 
@@ -192,7 +192,7 @@ end
     ∂u_on_u_actual2D = Field(Face, Centre, ∂u_on_u_data, grid2D)
     ∂v_on_v_actual2D = Field(Centre, Face, ∂v_on_v_data, grid2D)
 
-    h2D_from_outer = Field2D(Centre, Centre, hdata[1:nx, 1:ny], grid2D)
+    h2D_from_outer = Field2D(Centre, Centre, Cdata[1:nx, 1:ny], grid2D)
     u2D_from_outer = Field2D(Face, Centre, udata[1:nx, 1:ny], grid2D)
     v2D_from_outer = Field2D(Centre, Face, vdata[1:nx, 1:ny], grid2D)
 
@@ -229,5 +229,5 @@ end
     @test test_∂y(∂hy_on_h_actual2D, ∂vtest2D, h2D)
     @test test_∂x(∂u_on_u_actual2D, ∂hutest2D, u2D)
     @test test_∂y(∂v_on_v_actual2D, ∂hvtest2D, v2D)
-
+    =#
 end
