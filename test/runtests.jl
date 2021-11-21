@@ -1,4 +1,4 @@
-using MixedLayerThermoclineDynamics, OffsetArrays, Test
+using MixedLayerThermoclineDynamics, OffsetArrays, Test, Documenter
 
 const rtol_interpolation = 8e-4
 const rtol_derivatives = 8e-4
@@ -229,4 +229,8 @@ end
     @test test_∂y(∂y_CCdata_on_CC_Field2D, CCtest_Field2D, CC_Field2D)
     @test test_∂x(∂x_FCdata_on_FC_Field2D, FCtest_Field2D, FC_Field2D)
     @test test_∂y(∂y_CFdata_on_CF_Field2D, CFtest_Field2D, CF_Field2D)
+end
+
+@time @testset "Doctests" begin
+    doctest(MixedLayerThermoclineDynamics)
 end
