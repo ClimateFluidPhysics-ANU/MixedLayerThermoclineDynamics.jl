@@ -113,7 +113,7 @@ julia> grid = Grid2D(Periodic(), Periodic(), 10, 15, 0, 2.0, 0, 3.0)
   ├──── resolution ny: 15
   ├── grid spacing dy: 0.2
   └─── halo points ny: 1
-  ```
+```
 """
 function Grid2D(Tx, Ty, nx, ny, x_start, x_end, y_start, y_end; hx=1, hy=1)
 
