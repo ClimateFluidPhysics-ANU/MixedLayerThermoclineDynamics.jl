@@ -102,7 +102,7 @@ Example
 julia> using MixedLayerThermoclineDynamics
 
 julia> grid = Grid2D(Periodic(), Periodic(), 10, 15, 0, 2.0, 0, 3.0)
-1-Dimensional Grid
+2-Dimensional Grid
   ├──── topology in x: Periodic
   ├─ domain extent Lx: 2.0
   ├──── resolution nx: 10
@@ -177,12 +177,12 @@ show(io::IO, grid::Grid1D{Tx}) where Tx =
 
 show(io::IO, grid::Grid2D{Tx, Ty}) where {Tx, Ty} =
      print(io, "2-Dimensional Grid\n",
-               "  ├─────topology in x: ", Tx, '\n',
+               "  ├──── topology in x: ", Tx, '\n',
                "  ├─ domain extent Lx: ", grid.Lx, '\n',
                "  ├──── resolution nx: ", grid.nx, '\n',
                "  ├── grid spacing dx: ", grid.dx, '\n',
                "  ├─── halo points nx: ", grid.hx, '\n',
-               "  ├─────topology in y: ", Ty, '\n',
+               "  ├──── topology in y: ", Ty, '\n',
                "  ├─ domain extent Ly: ", grid.Ly, '\n',
                "  ├──── resolution ny: ", grid.ny, '\n',
                "  ├── grid spacing dy: ", grid.dy, '\n',
